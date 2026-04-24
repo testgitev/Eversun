@@ -76,6 +76,8 @@ export default function ClientAggregationView() {
       case 'consuel-en-cours':
       case 'consuel-finalise':
         return <Lightning className="h-4 w-4" />;
+      case 'installation':
+        return <House className="h-4 w-4" />;
       case 'raccordement':
       case 'raccordement-mes':
         return <House className="h-4 w-4" />;
@@ -98,6 +100,8 @@ export default function ClientAggregationView() {
         return 'Consuel En cours';
       case 'consuel-finalise':
         return 'Consuel Finalisé';
+      case 'installation':
+        return 'Installation En cours';
       case 'raccordement':
         return 'Raccordement';
       case 'raccordement-mes':

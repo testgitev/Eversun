@@ -8,6 +8,7 @@ const sectionToCollection = {
   'dp-accordes': 'dp_received',
   'dp-refuses': 'dp_ko',
   'daact': 'daact',
+  'installation': 'installations',
   'consuel-en-cours': 'consuel_in_progress',
   'consuel-finalise': 'consuel_finalised',
   raccordement: 'raccordement',
@@ -18,7 +19,7 @@ export async function POST(request: Request) {
   try {
     await connectToDatabase();
     const data = await request.json();
-    const { section, client, statut, noDp, ville, dateEnvoi, dateDerniereDemarche, dateMiseEnService } = data;
+    const { section, client, statut, noDp, ville, dateEnvoi, dateDerniereDemarche, dateMiseEnService, datePV } = data;
 
     if (!client) {
       return NextResponse.json({ error: 'Client name is required' }, { status: 400 });
@@ -41,7 +42,7 @@ export async function POST(request: Request) {
 
     // Update the specific stage data
     const stageKey = section;
-    const dateField = dateEnvoi || dateDerniereDemarche || dateMiseEnService;
+    const dateField = dateEnvoi || dateDerniereDemarche || dateMiseEnService || datePV;
 
     if (stageKey) {
       // Store stage information in the client record as object
@@ -87,6 +88,7 @@ export async function GET(request: Request) {
         { section: 'dp-accordes', name: 'dp_received' },
         { section: 'dp-refuses', name: 'dp_ko' },
         { section: 'daact', name: 'daact' },
+        { section: 'installation', name: 'installations' },
         { section: 'consuel-en-cours', name: 'consuel_in_progress' },
         { section: 'consuel-finalise', name: 'consuel_finalised' },
         { section: 'raccordement', name: 'raccordement' },
@@ -126,7 +128,7 @@ export async function GET(request: Request) {
               clientRecord.stages = {};
             }
 
-            const dateField = record.dateEnvoi || record.dateDerniereDemarche || record.dateMiseEnService;
+            const dateField = record.dateEnvoi || record.dateDerniereDemarche || record.dateMiseEnService || record.datePV;
 
             (clientRecord.stages as any)[col.section] = {
               statut: record.statut || '',

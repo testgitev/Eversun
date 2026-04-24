@@ -7,6 +7,7 @@ export type Section =
   | 'dp-accordes'
   | 'dp-refuses'
   | 'daact'
+  | 'installation'
   | 'consuel-en-cours'
   | 'consuel-finalise'
   | 'raccordement'
@@ -57,6 +58,8 @@ export interface ClientRecord {
   typeConsuel?: string;
   /** Date dernière démarche (pour section Consuel) */
   dateDerniereDemarche?: string;
+  /** Date de PV (pour section Installation) */
+  datePV?: string;
   /** Commentaires (pour section Consuel) */
   commentaires?: string;
   /** Raccordement (pour section Raccordement) */

@@ -58,6 +58,7 @@ const consuelStatuts = [
 ];
 const raccordementStatuts = ['Demande transmise', 'Demande à effectuer'];
 const daactStatuts = ['En attente', 'Validé', 'Refusé'];
+const installationStatuts = ['En attente date de pose', 'Date prévue'];
 const consuelTypes = ['Violet', 'Bleu'];
 const prestataires = ['Eversun', 'Projet Solaire'];
 
@@ -84,6 +85,7 @@ export default function ClientForm({
     motDePasse: client?.motDePasse ?? '',
     type: client?.type ?? '',
     pvChantier: client?.pvChantier ?? '',
+    datePV: client?.datePV ?? '',
     causeNonPresence: client?.causeNonPresence ?? '',
     etatActuel: client?.etatActuel ?? '',
     typeConsuel: client?.typeConsuel ?? '',
@@ -155,6 +157,7 @@ export default function ClientForm({
         etatActuel: client?.etatActuel ?? '',
         typeConsuel: client?.typeConsuel ?? '',
         dateDerniereDemarche: client?.dateDerniereDemarche ?? '',
+        datePV: client?.datePV ?? '',
         commentaires: client?.commentaires ?? '',
         raccordement: client?.raccordement ?? '',
         numeroContrat: client?.numeroContrat ?? '',
@@ -254,6 +257,14 @@ export default function ClientForm({
         }
       }
 
+      if (section === 'installation' && key === 'statut' && value === 'En attente date de pose' && prev.dateEstimative) {
+        next.pvChantier = 'En attente';
+      }
+
+      if (section === 'installation' && key === 'dateEstimative' && prev.statut === 'En attente date de pose') {
+        next.pvChantier = 'En attente';
+      }
+
       return next;
     });
 
@@ -328,6 +339,7 @@ export default function ClientForm({
         dateEnvoi: formatDateInput(form.dateEnvoi ?? ''),
         dateEstimative: formatDateInput(form.dateEstimative ?? ''),
         pvChantier: formatDateInput(form.pvChantier ?? ''),
+        datePV: formatDateInput(form.datePV ?? ''),
         dateDerniereDemarche: formatDateInput(form.dateDerniereDemarche ?? ''),
         dateMiseEnService: formatDateInput(form.dateMiseEnService ?? ''),
         raccordement: form.raccordement ?? '',
@@ -348,6 +360,7 @@ export default function ClientForm({
   };
 
   const isDp = section.startsWith('dp');
+  const isInstallation = section === 'installation';
   const isConsuel = section.startsWith('consuel');
   const isRaccordement = section === 'raccordement';
   const isRaccordementMes = section === 'raccordement-mes';
@@ -356,13 +369,15 @@ export default function ClientForm({
   const prestataireOptions = prestataires.map((p) => ({ value: p, label: p }));
   const statutOptions = isDp
     ? dpStatuts.map((s) => ({ value: s, label: s }))
-    : isConsuel
-      ? consuelStatuts.map((s) => ({ value: s, label: s }))
-      : isRaccordement
-        ? raccordementStatuts.map((s) => ({ value: s, label: s }))
-        : isDaact
-          ? daactStatuts.map((s) => ({ value: s, label: s }))
-          : [];
+    : isInstallation
+      ? installationStatuts.map((s) => ({ value: s, label: s }))
+      : isConsuel
+        ? consuelStatuts.map((s) => ({ value: s, label: s }))
+        : isRaccordement
+          ? raccordementStatuts.map((s) => ({ value: s, label: s }))
+          : isDaact
+            ? daactStatuts.map((s) => ({ value: s, label: s }))
+            : [];
   const financementOptions = ['Sunlib', 'Otovo', 'Upfront'].map((f) => ({
     value: f,
     label: f,
@@ -580,6 +595,45 @@ export default function ClientForm({
                     placeholder="Mot de passe"
                     icon={<Key className="h-4 w-4" />}
                     name="motDePasse"
+                  />
+                </div>
+              </div>
+            )}
+
+            {isInstallation && (
+              <div id="form-installation" className="bg-gray-50 dark:bg-gray-800 rounded-xl p-6 border border-gray-200 dark:border-gray-700">
+                <h3 className="text-lg font-bold text-gray-900 dark:text-white mb-6 flex items-center gap-2">
+                  <House className="h-5 w-5 text-primary-500" weight="bold" />
+                  Détails Installation
+                </h3>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                  <Select
+                    label="Statut"
+                    value={form.statut}
+                    onChange={(e) => handleChange('statut', e.target.value)}
+                    options={installationStatuts.map((s) => ({ value: s, label: s }))}
+                    placeholder="Sélectionner un statut"
+                  />
+                  <Select
+                    label="PV Chantier"
+                    value={form.pvChantier}
+                    onChange={(e) => handleChange('pvChantier', e.target.value)}
+                    options={['En attente', 'Reçu'].map((value) => ({ value, label: value }))}
+                    placeholder="Sélectionner un statut PV"
+                  />
+                  <DatePicker
+                    label="Date prévue"
+                    value={form.dateEstimative}
+                    onChange={(value) => handleChange('dateEstimative', value)}
+                    icon={<Calendar className="h-4 w-4" />}
+                    name="dateEstimative"
+                  />
+                  <DatePicker
+                    label="Date PV"
+                    value={form.datePV}
+                    onChange={(value) => handleChange('datePV', value)}
+                    icon={<Calendar className="h-4 w-4" />}
+                    name="datePV"
                   />
                 </div>
               </div>

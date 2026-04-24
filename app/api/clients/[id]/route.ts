@@ -9,6 +9,7 @@ const sectionToCollection = {
   'dp-accordes': 'dp_received',
   'dp-refuses': 'dp_ko',
   daact: 'daact',
+  installation: 'installations',
   'consuel-en-cours': 'consuel_in_progress',
   'consuel-finalise': 'consuel_finalised',
   raccordement: 'raccordement',

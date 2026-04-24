@@ -28,6 +28,7 @@ import {
   ArrowClockwise,
   MagnifyingGlass,
   Buildings,
+  House,
   MapPin,
   Clock,
   CheckSquare,
@@ -132,6 +133,7 @@ export default function ClientSection({ section }: ClientSectionProps) {
       'dp-accordes': 'Déclaration Préalable – Accordés',
       'dp-refuses': 'Déclaration Préalable – Refus',
       'daact': 'Déclaration attestant l\'achèvement et la conformité des travaux',
+      installation: 'Installation – En cours',
       'consuel-en-cours': 'Consuel – En cours',
       'consuel-finalise': 'Consuel – Finalisé',
       raccordement: 'Raccordement',
@@ -147,6 +149,7 @@ export default function ClientSection({ section }: ClientSectionProps) {
       'dp-accordes': <CheckCircle className="h-6 w-6" weight="bold" />,
       'dp-refuses': <XCircle className="h-6 w-6" weight="bold" />,
       'daact': <CheckSquare className="h-6 w-6" weight="bold" />,
+      installation: <House className="h-6 w-6" weight="bold" />,
       'consuel-en-cours': <Circle className="h-6 w-6" weight="bold" />,
       'consuel-finalise': <CheckCircle className="h-6 w-6" weight="bold" />,
       raccordement: <Lightning className="h-6 w-6" weight="bold" />,
@@ -162,6 +165,7 @@ export default function ClientSection({ section }: ClientSectionProps) {
       'dp-accordes': 'from-emerald-500 to-green-500',
       'dp-refuses': 'from-red-500 to-rose-500',
       'daact': 'from-emerald-500 to-green-500',
+      installation: 'from-sky-500 to-indigo-500',
       'consuel-en-cours': 'from-teal-500 to-cyan-500',
       'consuel-finalise': 'from-emerald-500 to-green-500',
       raccordement: 'from-teal-500 to-cyan-500',
@@ -244,6 +248,17 @@ export default function ClientSection({ section }: ClientSectionProps) {
     if (section === 'consuel-en-cours' && record.causeNonPresence === 'Consuel envoyé' && record.etatActuel === 'Consuel Visé') {
       toSave.section = 'consuel-finalise';
       newSection = 'consuel-finalise';
+    }
+    if (section === 'installation' && record.pvChantier === 'Reçu') {
+      try {
+        await fetch('/api/clients', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ section: 'consuel-en-cours', client: record.client }),
+        });
+      } catch (syncError) {
+        console.error('Erreur lors de la création du consuel en cours:', syncError);
+      }
     }
     // Cas déplacement de collection
     if (record._id && oldSection !== newSection) {

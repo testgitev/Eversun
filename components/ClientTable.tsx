@@ -130,6 +130,7 @@ export default function ClientTable({
   const isConsuelEnCours = section === 'consuel-en-cours';
   const isConsuelFinalise = section === 'consuel-finalise';
   const isConsuel = isConsuelEnCours || isConsuelFinalise;
+  const isInstallation = section === 'installation';
   const isRaccordement = section === 'raccordement';
   const isRaccordementMes = section === 'raccordement-mes';
 
@@ -157,6 +158,13 @@ export default function ClientTable({
       { key: 'noDp', label: 'Numéro DP' },
       { key: 'ville', label: 'Ville' },
       { key: 'statut', label: 'DAACT' }
+    );
+  } else if (isInstallation) {
+    columns.push(
+      { key: 'client', label: 'Client' },
+      { key: 'statut', label: 'Statut' },
+      { key: 'pvChantier', label: 'PV Chantier' },
+      { key: 'datePV', label: 'Date PV' }
     );
   } else if (isConsuelEnCours) {
     columns.push(
@@ -490,7 +498,8 @@ export default function ClientTable({
                         col.key === 'dateEstimative' ||
                         col.key === 'pvChantier' ||
                         col.key === 'dateDerniereDemarche' ||
-                        col.key === 'dateMiseEnService' ? (
+                        col.key === 'dateMiseEnService' ||
+                        col.key === 'datePV' ? (
                           formatDateFR(item[col.key] as string)
                         ) : col.key === 'portail' &&
                           isDp &&

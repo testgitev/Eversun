@@ -12,6 +12,7 @@ export const ClientSchema = new mongoose.Schema({
       'dp-accordes',
       'dp-refuses',
       'daact',
+      'installation',
       'consuel-en-cours',
       'consuel-finalise',
       'raccordement',
@@ -31,12 +32,12 @@ export const ClientSchema = new mongoose.Schema({
   motDePasse: String,
   type: String,
   pvChantier: String,
+  datePV: String,
   causeNonPresence: String,
   etatActuel: String,
   typeConsuel: String,
   dateDerniereDemarche: String,
   commentaires: String,
-  raccordement: String,
   numeroContrat: String,
   dateMiseEnService: String,
   stages: {
@@ -60,6 +61,7 @@ export interface IClient extends mongoose.Document {
   motDePasse?: string;
   type?: string;
   pvChantier?: string;
+  datePV?: string;
   causeNonPresence?: string;
   etatActuel?: string;
   typeConsuel?: string;

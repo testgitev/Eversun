@@ -11,10 +11,12 @@ import {
   Flag,
   CaretLeft,
   CaretRight,
+  CaretDown,
   CheckSquare,
   MagnifyingGlass,
   X,
   List,
+  House,
 } from '@phosphor-icons/react';
 import { Section } from '@/types/client';
 import Input from '@/components/ui/Input';
@@ -61,6 +63,16 @@ const sectionGroups = [
     ],
   },
   {
+    title: 'Installation',
+    sections: [
+      {
+        id: 'installation' as const,
+        label: 'Installation en cours',
+        icon: House,
+      },
+    ],
+  },
+  {
     title: 'Certifications Consuel',
     sections: [
       {
@@ -103,6 +115,7 @@ export default function Sidebar({
   const [isCollapsed, setIsCollapsed] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
   const [isMobile, setIsMobile] = useState(false);
+  const [openGroups, setOpenGroups] = useState<Set<string>>(new Set(sectionGroups.map((group) => group.title)));
 
   useEffect(() => {
     const checkMobile = () => {
@@ -119,6 +132,18 @@ export default function Sidebar({
       onCollapsedChange(isCollapsed);
     }
   }, [isCollapsed, onCollapsedChange]);
+
+  const toggleGroup = (groupTitle: string) => {
+    setOpenGroups((prev) => {
+      const next = new Set(prev);
+      if (next.has(groupTitle)) {
+        next.delete(groupTitle);
+      } else {
+        next.add(groupTitle);
+      }
+      return next;
+    });
+  };
 
   // Load saved state
   useEffect(() => {
@@ -207,70 +232,83 @@ export default function Sidebar({
       )}
 
       <nav className="py-4 flex-1 overflow-y-auto">
-        {filteredSectionGroups.map((group, groupIndex) => (
-          <div key={group.title} className="mb-6">
-            {!isCollapsed && (
-              <div className="px-4 mb-3">
-                <span className="text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider">
-                  {group.title}
-                </span>
-              </div>
-            )}
-            <ul className="space-y-2 px-2" role="list">
-              {group.sections.map((section, sectionIndex) => {
-                const globalIndex = sectionGroups.slice(0, groupIndex).reduce((acc, g) => acc + g.sections.length, 0) + sectionIndex + 1;
-                return (
-                  <li key={section.id} role="listitem">
-                    <button
-                      onClick={() => setActiveSection(section.id)}
-                      className={`w-full text-left rounded-lg text-sm font-semibold transition-all duration-200 flex items-center group relative overflow-hidden
-                        ${
-                          isCollapsed ? 'justify-center px-3 py-3' : 'px-4 py-3 gap-3'
-                        }
-                        ${
-                          activeSection === section.id
-                            ? 'bg-primary-500 text-white shadow-sm ring-2 ring-primary-500 ring-offset-2 ring-offset-gray-100 dark:ring-offset-gray-900'
-                            : 'text-secondary hover:bg-secondary focus:outline-none focus:ring-2 focus:ring-primary-500 focus:ring-offset-2 focus:ring-offset-white dark:focus:ring-offset-gray-900'
-                        }`}
-                      tabIndex={0}
-                      aria-current={activeSection === section.id ? 'page' : undefined}
-                      title={isCollapsed ? `${section.label} (Alt+${globalIndex})` : undefined}
-                    >
-                      {activeSection === section.id && (
-                        <div className="absolute inset-0 bg-gradient-to-r from-white/20 via-transparent to-white/20 translate-x-[-100%] group-hover:translate-x-[100%] transition-transform duration-700" />
-                      )}
-                      {section.icon && (
-                        <section.icon
-                          weight="regular"
-                          className={`h-5 w-5 flex-shrink-0 transition-all duration-200 ${
-                            activeSection === section.id ? 'text-white scale-110' : 'text-gray-400 dark:text-gray-500 group-hover:text-primary-500 dark:group-hover:text-primary-400 group-hover:scale-110'
-                          }`}
-                          aria-hidden="true"
-                        />
-                      )}
-                      {!isCollapsed && (
-                        <>
-                          <span className="flex-1 relative z-10">{section.label}</span>
-                          {sectionCounts && sectionCounts[section.id] !== undefined && (
-                            <span
-                              className={`text-xs font-bold px-2 py-1 rounded-full transition-all duration-200 relative z-10 ${
-                                activeSection === section.id
-                                  ? 'bg-white dark:bg-gray-800 text-primary-600 shadow'
-                                  : 'bg-primary-100 dark:bg-primary-900/30 text-primary-600 dark:text-primary-400 group-hover:bg-primary-200 dark:group-hover:bg-primary-800/50'
-                              }`}
-                            >
-                              {sectionCounts[section.id]}
-                            </span>
+        {filteredSectionGroups.map((group, groupIndex) => {
+          const isGroupOpen = isCollapsed || openGroups.has(group.title) || searchQuery.trim() !== '';
+          return (
+            <div key={group.title} className="mb-6">
+              {!isCollapsed && (
+                <button
+                  type="button"
+                  onClick={() => toggleGroup(group.title)}
+                  className="w-full flex items-center justify-between px-4 py-3 text-xs font-semibold uppercase tracking-wider text-gray-500 dark:text-gray-400 rounded-lg hover:bg-secondary/50 transition-colors"
+                >
+                  <span>{group.title}</span>
+                  <CaretDown
+                    weight="bold"
+                    className={`h-4 w-4 transition-transform ${isGroupOpen ? 'rotate-180' : ''}`}
+                  />
+                </button>
+              )}
+              {isGroupOpen && (
+                <ul className="space-y-2 px-2 mt-3" role="list">
+                  {group.sections.map((section, sectionIndex) => {
+                    const globalIndex = sectionGroups
+                      .slice(0, groupIndex)
+                      .reduce((acc, g) => acc + g.sections.length, 0) + sectionIndex + 1;
+                    return (
+                      <li key={section.id} role="listitem">
+                        <button
+                          onClick={() => setActiveSection(section.id)}
+                          className={`w-full text-left rounded-lg text-sm font-semibold transition-all duration-200 flex items-center group relative overflow-hidden
+                            ${
+                              isCollapsed ? 'justify-center px-3 py-3' : 'px-4 py-3 gap-3'
+                            }
+                            ${
+                              activeSection === section.id
+                                ? 'bg-primary-500 text-white shadow-sm ring-2 ring-primary-500 ring-offset-2 ring-offset-gray-100 dark:ring-offset-gray-900'
+                                : 'text-secondary hover:bg-secondary focus:outline-none focus:ring-2 focus:ring-primary-500 focus:ring-offset-2 focus:ring-offset-white dark:focus:ring-offset-gray-900'
+                            }`}
+                          tabIndex={0}
+                          aria-current={activeSection === section.id ? 'page' : undefined}
+                          title={isCollapsed ? `${section.label} (Alt+${globalIndex})` : undefined}
+                        >
+                          {activeSection === section.id && (
+                            <div className="absolute inset-0 bg-gradient-to-r from-white/20 via-transparent to-white/20 translate-x-[-100%] group-hover:translate-x-[100%] transition-transform duration-700" />
                           )}
-                        </>
-                      )}
-                    </button>
-                  </li>
-                );
-              })}
-            </ul>
-          </div>
-        ))}
+                          {section.icon && (
+                            <section.icon
+                              weight="regular"
+                              className={`h-5 w-5 flex-shrink-0 transition-all duration-200 ${
+                                activeSection === section.id ? 'text-white scale-110' : 'text-gray-400 dark:text-gray-500 group-hover:text-primary-500 dark:group-hover:text-primary-400 group-hover:scale-110'
+                              }`}
+                              aria-hidden="true"
+                            />
+                          )}
+                          {!isCollapsed && (
+                            <>
+                              <span className="flex-1 relative z-10">{section.label}</span>
+                              {sectionCounts && sectionCounts[section.id] !== undefined && (
+                                <span
+                                  className={`text-xs font-bold px-2 py-1 rounded-full transition-all duration-200 relative z-10 ${
+                                    activeSection === section.id
+                                      ? 'bg-white dark:bg-gray-800 text-primary-600 shadow'
+                                      : 'bg-primary-100 dark:bg-primary-900/30 text-primary-600 dark:text-primary-400 group-hover:bg-primary-200 dark:group-hover:bg-primary-800/50'
+                                  }`}
+                                >
+                                  {sectionCounts[section.id]}
+                                </span>
+                              )}
+                            </>
+                          )}
+                        </button>
+                      </li>
+                    );
+                  })}
+                </ul>
+              )}
+            </div>
+            );
+          })}
       </nav>
 
       {/* Collapse Toggle - Desktop only */}

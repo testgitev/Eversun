@@ -19,6 +19,7 @@ export async function GET() {
       { section: 'dp-accordes', name: 'dp_received' },
       { section: 'dp-refuses', name: 'dp_ko' },
       { section: 'daact', name: 'daact' },
+      { section: 'installation', name: 'installations' },
       { section: 'consuel-en-cours', name: 'consuel_in_progress' },
       { section: 'consuel-finalise', name: 'consuel_finalised' },
       { section: 'raccordement', name: 'raccordement' },
