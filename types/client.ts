@@ -3,6 +3,7 @@
  * Correspond aux différentes étapes du processus de suivi des installations solaires
  */
 export type Section =
+  | 'clients'
   | 'dp-en-cours'
   | 'dp-accordes'
   | 'dp-refuses'
@@ -48,8 +49,10 @@ export interface ClientRecord {
   motDePasse?: string;
   /** Type de certification Consuel (ex: Violet, Bleu) */
   type?: string;
-  /** PV Chantier (pour section Consuel) */
+  /** PV Chantier status (pour section Installation) */
   pvChantier?: string;
+  /** PV Chantier date (pour section Consuel) */
+  pvChantierDate?: string;
   /** Cause de non présence Consuel (pour section Consuel) */
   causeNonPresence?: string;
   /** Etat Actuel (pour section Consuel) */
@@ -68,4 +71,10 @@ export interface ClientRecord {
   numeroContrat?: string;
   /** Date de Mise en service raccordement (pour section Raccordement MES) */
   dateMiseEnService?: string;
+  /** Historique des étapes pour voir le parcours du dossier */
+  stages?: Record<string, {
+    statut?: string;
+    date?: string;
+    updatedAt?: string | Date;
+  }>;
 }

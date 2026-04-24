@@ -28,6 +28,7 @@ export const clientSchema = z.object({
   motDePasse: z.string().optional(),
   type: z.string().optional(),
   pvChantier: z.string().optional(),
+  pvChantierDate: z.string().optional(),
   causeNonPresence: z.string().optional(),
   etatActuel: z.string().optional(),
   typeConsuel: z.string().optional(),

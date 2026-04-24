@@ -332,13 +332,13 @@ export default function ClientModal({
                   Informations Consuel
                 </h3>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                  {selectedClient.pvChantier && (
+                  {selectedClient.pvChantierDate && (
                     <div className="flex items-center gap-3 p-4 bg-secondary rounded-lg border border-primary">
                       <Calendar className="h-4 w-4 text-teal-500" weight="bold" />
                       <div>
                         <p className="text-xs font-semibold text-tertiary">PV Chantier</p>
                         <p className="font-medium text-primary">
-                          {formatDateFR(selectedClient.pvChantier)}
+                          {formatDateFR(selectedClient.pvChantierDate)}
                         </p>
                       </div>
                     </div>

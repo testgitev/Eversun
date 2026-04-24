@@ -2,6 +2,7 @@ import { NextResponse } from 'next/server';
 import { connectToDatabase } from '@/lib/mongo';
 import mongoose from 'mongoose';
 import { ClientSchema } from '@/lib/clientModel';
+import { clientCollectionName } from '@/lib/sectionConfig';
 
 export async function GET() {
   try {
@@ -13,33 +14,23 @@ export async function GET() {
     }
     await connectToDatabase();
 
-    const collections = [
-      { section: 'clients', name: 'clients' },
-      { section: 'dp-en-cours', name: 'dp_in_progress' },
-      { section: 'dp-accordes', name: 'dp_received' },
-      { section: 'dp-refuses', name: 'dp_ko' },
-      { section: 'daact', name: 'daact' },
-      { section: 'installation', name: 'installations' },
-      { section: 'consuel-en-cours', name: 'consuel_in_progress' },
-      { section: 'consuel-finalise', name: 'consuel_finalised' },
-      { section: 'raccordement', name: 'raccordement' },
-      { section: 'raccordement-mes', name: 'raccordement_finalised' },
-    ];
+    const Model =
+      mongoose.models[clientCollectionName] ||
+      mongoose.model(clientCollectionName, ClientSchema, clientCollectionName);
+
+    const aggregation = await Model.aggregate([
+      {
+        $group: {
+          _id: '$section',
+          count: { $sum: 1 },
+        },
+      },
+    ]);
 
     const counts: Record<string, number> = {};
-
-    for (const col of collections) {
-      try {
-        const Model =
-          mongoose.models[col.name] ||
-          mongoose.model(col.name, ClientSchema, col.name);
-        const count = await Model.countDocuments();
-        counts[col.section] = count;
-      } catch (err: any) {
-        console.error(`Error counting ${col.name}:`, err);
-        counts[col.section] = 0;
-      }
-    }
+    aggregation.forEach((group: any) => {
+      counts[group._id || 'unknown'] = group.count;
+    });
 
     return NextResponse.json({ counts });
   } catch (error: any) {

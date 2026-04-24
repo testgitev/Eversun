@@ -32,6 +32,7 @@ export const ClientSchema = new mongoose.Schema({
   motDePasse: String,
   type: String,
   pvChantier: String,
+  pvChantierDate: String,
   datePV: String,
   causeNonPresence: String,
   etatActuel: String,
@@ -61,6 +62,7 @@ export interface IClient extends mongoose.Document {
   motDePasse?: string;
   type?: string;
   pvChantier?: string;
+  pvChantierDate?: string;
   datePV?: string;
   causeNonPresence?: string;
   etatActuel?: string;

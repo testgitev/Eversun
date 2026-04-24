@@ -10,6 +10,12 @@ import AutocompleteInput from '@/components/ui/AutocompleteInput';
 import Badge from '@/components/ui/Badge';
 import { cn } from '@/lib/utils';
 import {
+  installationStatuts,
+  financementOptions,
+  pvChantierStatusOptions,
+  consuelTypes,
+} from '@/lib/sectionConfig';
+import {
   FloppyDisk,
   X,
   User,
@@ -58,8 +64,6 @@ const consuelStatuts = [
 ];
 const raccordementStatuts = ['Demande transmise', 'Demande à effectuer'];
 const daactStatuts = ['En attente', 'Validé', 'Refusé'];
-const installationStatuts = ['En attente date de pose', 'Date prévue'];
-const consuelTypes = ['Violet', 'Bleu'];
 
 export default function ClientForm({
   section,
@@ -84,6 +88,7 @@ export default function ClientForm({
     motDePasse: client?.motDePasse ?? '',
     type: client?.type ?? '',
     pvChantier: client?.pvChantier ?? '',
+    pvChantierDate: client?.pvChantierDate ?? '',
     datePV: client?.datePV ?? '',
     causeNonPresence: client?.causeNonPresence ?? '',
     etatActuel: client?.etatActuel ?? '',
@@ -152,6 +157,7 @@ export default function ClientForm({
         motDePasse: client?.motDePasse ?? '',
         type: client?.type ?? '',
         pvChantier: client?.pvChantier ?? '',
+        pvChantierDate: client?.pvChantierDate ?? '',
         causeNonPresence: client?.causeNonPresence ?? '',
         etatActuel: client?.etatActuel ?? '',
         typeConsuel: client?.typeConsuel ?? '',
@@ -337,7 +343,8 @@ export default function ClientForm({
         section: finalSection,
         dateEnvoi: formatDateInput(form.dateEnvoi ?? ''),
         dateEstimative: formatDateInput(form.dateEstimative ?? ''),
-        pvChantier: section === 'installation' ? form.pvChantier ?? '' : formatDateInput(form.pvChantier ?? ''),
+        pvChantier: form.pvChantier ?? '',
+        pvChantierDate: formatDateInput(form.pvChantierDate ?? ''),
         datePV: formatDateInput(form.datePV ?? ''),
         dateDerniereDemarche: formatDateInput(form.dateDerniereDemarche ?? ''),
         dateMiseEnService: formatDateInput(form.dateMiseEnService ?? ''),
@@ -376,7 +383,7 @@ export default function ClientForm({
           : isDaact
             ? daactStatuts.map((s) => ({ value: s, label: s }))
             : [];
-  const financementOptions = ['Sunlib', 'Otovo', 'Upfront'].map((f) => ({
+  const financementOptionsList = financementOptions.map((f) => ({
     value: f,
     label: f,
   }));
@@ -469,7 +476,7 @@ export default function ClientForm({
                       label="Financement *"
                       value={form.financement}
                       onChange={(e) => handleChange('financement', e.target.value)}
-                      options={financementOptions}
+                      options={financementOptionsList}
                       placeholder="Sélectionner un financement"
                       required
                       error={errors.financement}
@@ -542,7 +549,7 @@ export default function ClientForm({
                     label="Financement"
                     value={form.financement}
                     onChange={(e) => handleChange('financement', e.target.value)}
-                    options={financementOptions}
+                    options={financementOptionsList}
                     placeholder="Sélectionner un financement"
                   />
                 </div>
@@ -624,7 +631,7 @@ export default function ClientForm({
                     label="PV Chantier"
                     value={form.pvChantier}
                     onChange={(e) => handleChange('pvChantier', e.target.value)}
-                    options={['En attente', 'Reçu'].map((value) => ({ value, label: value }))}
+                    options={pvChantierStatusOptions.map((value) => ({ value, label: value }))}
                     placeholder="Sélectionner un statut PV"
                   />
                   <DatePicker
@@ -654,10 +661,10 @@ export default function ClientForm({
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                   <DatePicker
                     label="PV Chantier"
-                    value={form.pvChantier}
-                    onChange={(value) => handleChange('pvChantier', value)}
+                    value={form.pvChantierDate}
+                    onChange={(value) => handleChange('pvChantierDate', value)}
                     icon={<Calendar className="h-4 w-4" />}
-                    name="pvChantier"
+                    name="pvChantierDate"
                   />
                   <Select
                     label="Cause de non présence Consuel"
