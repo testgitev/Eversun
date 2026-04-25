@@ -2,67 +2,57 @@ import { NextResponse } from 'next/server';
 import { connectToDatabase } from '@/lib/mongo';
 import mongoose from 'mongoose';
 import { ClientSchema } from '@/lib/clientModel';
-
-const sectionToCollection = {
-  'dp-en-cours': 'dp_in_progress',
-  'dp-accordes': 'dp_received',
-  'dp-refuses': 'dp_ko',
-  'daact': 'daact',
-  'installation': 'installations',
-  'consuel-en-cours': 'consuel_in_progress',
-  'consuel-finalise': 'consuel_finalised',
-  raccordement: 'raccordement',
-  'raccordement-mes': 'raccordement_finalised',
-};
+import { clientCollectionName } from '@/lib/sectionConfig';
 
 export async function POST(request: Request) {
   try {
     await connectToDatabase();
     const data = await request.json();
-    const { section, client, statut, noDp, ville, dateEnvoi, dateDerniereDemarche, dateMiseEnService, datePV } = data;
 
-    if (!client) {
+    if (!data.client) {
       return NextResponse.json({ error: 'Client name is required' }, { status: 400 });
     }
+    if (!data.section) {
+      return NextResponse.json({ error: 'Section is required' }, { status: 400 });
+    }
 
-    // Use the clients collection
-    const Model = mongoose.models.clients || mongoose.model('clients', ClientSchema, 'clients');
+    const Model =
+      mongoose.models[clientCollectionName] ||
+      mongoose.model(clientCollectionName, ClientSchema, clientCollectionName);
 
-    // Find or create the client record
-    let clientRecord = await Model.findOne({ client });
-
-    if (!clientRecord) {
-      clientRecord = new Model({
-        section: 'clients',
-        client,
-        ville: ville || '',
-        noDp: noDp || '',
+    const existing = await Model.findOne({ client: data.client });
+    if (!existing) {
+      const clientRecord = new Model({
+        ...data,
+        stages: {},
       });
+      await clientRecord.save();
+      return NextResponse.json({ success: true, data: clientRecord });
     }
 
-    // Update the specific stage data
-    const stageKey = section;
-    const dateField = dateEnvoi || dateDerniereDemarche || dateMiseEnService || datePV;
+    const stageDate =
+      data.dateEnvoi ||
+      data.dateDerniereDemarche ||
+      data.dateMiseEnService ||
+      data.datePV ||
+      data.pvChantierDate ||
+      '';
 
-    if (stageKey) {
-      // Store stage information in the client record as object
-      if (!clientRecord.stages) {
-        clientRecord.stages = {};
-      }
-      (clientRecord.stages as any)[stageKey] = {
-        statut: statut || '',
-        date: dateField || '',
+    const updatedStages = {
+      ...(existing.stages || {}),
+      [data.section]: {
+        statut: data.statut || '',
+        date: stageDate,
         updatedAt: new Date(),
-      };
-    }
+      },
+    };
 
-    // Update ville and noDp if provided
-    if (ville) clientRecord.ville = ville;
-    if (noDp) clientRecord.noDp = noDp;
+    existing.stages = updatedStages;
+    if (data.ville) existing.ville = data.ville;
+    if (data.noDp) existing.noDp = data.noDp;
+    await existing.save();
 
-    await clientRecord.save();
-
-    return NextResponse.json({ success: true, data: clientRecord });
+    return NextResponse.json({ success: true, data: existing });
   } catch (error: any) {
     console.error('Error syncing client data:', error);
     return NextResponse.json(
@@ -77,91 +67,17 @@ export async function GET(request: Request) {
     await connectToDatabase();
     const { searchParams } = new URL(request.url);
     const clientName = searchParams.get('client');
-    const syncAll = searchParams.get('syncAll') === 'true';
 
-    const Model = mongoose.models.clients || mongoose.model('clients', ClientSchema, 'clients');
-
-    if (syncAll) {
-      // Sync all clients from all sections to the clients collection
-      const collections = [
-        { section: 'dp-en-cours', name: 'dp_in_progress' },
-        { section: 'dp-accordes', name: 'dp_received' },
-        { section: 'dp-refuses', name: 'dp_ko' },
-        { section: 'daact', name: 'daact' },
-        { section: 'installation', name: 'installations' },
-        { section: 'consuel-en-cours', name: 'consuel_in_progress' },
-        { section: 'consuel-finalise', name: 'consuel_finalised' },
-        { section: 'raccordement', name: 'raccordement' },
-        { section: 'raccordement-mes', name: 'raccordement_finalised' },
-      ];
-
-      for (const col of collections) {
-        try {
-          const SectionModel = mongoose.models[col.name] || mongoose.model(col.name, ClientSchema, col.name);
-          const records = await SectionModel.find();
-
-          for (const record of records) {
-            if (!record.client) continue;
-
-            let clientRecord = await Model.findOne({ client: record.client });
-
-            if (!clientRecord) {
-              clientRecord = new Model({
-                section: 'clients',
-                client: record.client,
-                ville: record.ville || '',
-                noDp: record.noDp || '',
-                prestataire: record.prestataire || '',
-                financement: record.financement || '',
-                statut: record.statut || '',
-                dateEnvoi: record.dateEnvoi || '',
-                dateEstimative: record.dateEstimative || '',
-                portail: record.portail || '',
-                identifiant: record.identifiant || '',
-                motDePasse: record.motDePasse || '',
-                stages: {},
-              });
-            }
-
-            // Update stage information
-            if (!clientRecord.stages) {
-              clientRecord.stages = {};
-            }
-
-            const dateField = record.dateEnvoi || record.dateDerniereDemarche || record.dateMiseEnService || record.datePV;
-
-            (clientRecord.stages as any)[col.section] = {
-              statut: record.statut || '',
-              date: dateField || '',
-              updatedAt: new Date(),
-            };
-
-            // Update other fields if not set
-            if (!clientRecord.ville && record.ville) clientRecord.ville = record.ville;
-            if (!clientRecord.noDp && record.noDp) clientRecord.noDp = record.noDp;
-            if (!clientRecord.prestataire && record.prestataire) clientRecord.prestataire = record.prestataire;
-            if (!clientRecord.financement && record.financement) clientRecord.financement = record.financement;
-            if (!clientRecord.portail && record.portail) clientRecord.portail = record.portail;
-            if (!clientRecord.identifiant && record.identifiant) clientRecord.identifiant = record.identifiant;
-            if (!clientRecord.motDePasse && record.motDePasse) clientRecord.motDePasse = record.motDePasse;
-
-            await clientRecord.save();
-          }
-        } catch (err: any) {
-          console.error(`Error syncing ${col.name}:`, err);
-        }
-      }
-
-      const clientRecords = await Model.find().sort({ client: 1 });
-      return NextResponse.json({ data: clientRecords, synced: true });
-    }
+    const Model =
+      mongoose.models[clientCollectionName] ||
+      mongoose.model(clientCollectionName, ClientSchema, clientCollectionName);
 
     if (clientName) {
-      const clientRecord = await Model.findOne({ client: clientName });
+      const clientRecord = await Model.findOne({ client: clientName }).lean();
       return NextResponse.json({ data: clientRecord });
     }
 
-    const clientRecords = await Model.find().sort({ client: 1 });
+    const clientRecords = await Model.find().sort({ client: 1 }).lean();
     return NextResponse.json({ data: clientRecords });
   } catch (error: any) {
     console.error('Error fetching clients:', error);

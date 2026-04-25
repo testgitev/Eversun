@@ -18,6 +18,9 @@ Dashboard de suivi des installations solaires pour Eversun. Application Next.js 
 - Gestion des dossiers de Déclaration Préalable (DP)
 - Suivi des certifications Consuel
 - Gestion des demandes de raccordement
+- Suivi des installations avec statut, financing et commentaires
+- Options de financement : Otovo, Sunlib, Upfront
+- Gestion des dates de pose et des dates de PV séparées
 - Interface responsive (desktop et mobile)
 - Pagination côté serveur
 - Recherche et tri des données
@@ -174,11 +177,14 @@ Les mots de passe sont automatiquement hashés avec bcrypt avant d'être stocké
 
 - Crée un nouveau client
 - Body: JSON avec les données du client
+- Gère maintenant les sections dans une collection unifiée `clients`
+- Prend en charge les champs `financement`, `commentaires`, `pvChantierDate`, `datePose`
 
 **PATCH** `/api/clients/[id]?section=X`
 
 - Met à jour un client
 - Body: JSON avec les champs à modifier
+- Permet de mettre à jour le statut de l'installation, le financement, les commentaires et les dates
 
 **DELETE** `/api/clients/[id]?section=X`
 
@@ -211,6 +217,8 @@ Le projet utilise un design system personnalisé défini dans `globals.css` avec
 - **Pagination serveur**: API endpoints supportent maintenant la pagination
 - **React Query**: Mise en place du caching et gestion d'état des données
 - **Validation client-side**: react-hook-form + Zod pour validation robuste
+- **Refactor des clients**: centralisation sur une collection `clients` unifiée et métadonnées de section normalisées
+- **Installation améliorée**: ajout de `financement`, `commentaires`, `date de pose` et champ `pvChantierDate`
 - **Nettoyage console.log**: Suppression de tous les logs de debug
 
 

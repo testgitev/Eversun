@@ -232,10 +232,10 @@ export default function ClientSection({ section }: ClientSectionProps) {
   const statusCounts = getStatusCounts();
 
   const onSave = async (record: ClientRecord) => {
-    // Si on change de section (ex : Accord favorable ou Refus), il faut créer dans la nouvelle collection et supprimer dans l'ancienne
     const toSave = { ...record };
     const oldSection = section;
     let newSection = record.section;
+
     if (section === 'dp-en-cours' && (record.statut === 'Accord favorable' || record.statut === 'Accord tacite')) {
       toSave.section = 'dp-accordes';
       newSection = 'dp-accordes';
@@ -244,136 +244,87 @@ export default function ClientSection({ section }: ClientSectionProps) {
       toSave.section = 'dp-refuses';
       newSection = 'dp-refuses';
     }
-    // Logique Consuel: si "Consuel envoyé" ET "Consuel Visé", déplacer vers Consuel Finalisé
     if (section === 'consuel-en-cours' && record.causeNonPresence === 'Consuel envoyé' && record.etatActuel === 'Consuel Visé') {
       toSave.section = 'consuel-finalise';
       newSection = 'consuel-finalise';
     }
     if (section === 'installation' && record.pvChantier === 'Reçu') {
-      try {
-        await fetch('/api/clients', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ section: 'consuel-en-cours', client: record.client }),
-        });
-      } catch (syncError) {
-        console.error('Erreur lors de la création du consuel en cours:', syncError);
-      }
+      toSave.section = 'consuel-en-cours';
+      newSection = 'consuel-en-cours';
     }
-    // Cas déplacement de collection
-    if (record._id && oldSection !== newSection) {
-      // Optimistic UI: Update immediately
-      const previousClients = [...clients];
-      const optimisticRecord = { ...toSave, _id: record._id };
-      setClients((prev) =>
-        prev.map((item) => (item._id === record._id ? optimisticRecord : item))
-      );
-      
-      // 1. Créer dans la nouvelle collection
-      const { _id, id, ...toSend } = toSave;
-      try {
-        const res = await fetch('/api/clients', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify(toSend),
-        });
-        if (res.ok) {
-          const saved = await res.json();
-          // 2. Supprimer dans l'ancienne collection
-          const deleteRes = await fetch(`/api/clients/${record._id}?section=${oldSection}`, {
-            method: 'DELETE',
-          });
-          if (deleteRes.ok) {
-            setClients((prev) =>
-              prev.map((item) => (item._id === saved._id ? saved : item))
-            );
-            toast.success(`${record.client} a été déplacé vers ${newSection.replace('-', ' ').toUpperCase()}`);
-          } else {
-            // Revert on error
-            setClients(previousClients);
-            toast.error('Erreur lors de la suppression dans l\'ancienne section');
-          }
-        } else {
-          // Revert on error
-          setClients(previousClients);
-          const error = await res.json();
-          toast.error(`Impossible de mettre à jour ${record.client}: ${error.error || 'Erreur inconnue'}`);
-        }
-      } catch (error) {
-        // Revert on error
-        setClients(previousClients);
-        console.error('Erreur lors de la mise à jour:', error);
-        toast.error('Erreur de connexion au serveur');
-      }
-      return;
-    }
-    // Cas mise à jour simple - Optimistic UI
+
     if (record._id) {
       const previousClients = [...clients];
       const optimisticRecord = { ...toSave, _id: record._id };
-      setClients((prev) =>
-        prev.map((item) => (item._id === record._id ? optimisticRecord : item))
-      );
-      
+
+      if (oldSection !== newSection) {
+        setClients((prev) => prev.filter((item) => item._id !== record._id));
+      } else {
+        setClients((prev) =>
+          prev.map((item) => (item._id === record._id ? optimisticRecord : item))
+        );
+      }
+
       const { id, ...toSend } = toSave;
       try {
-        const res = await fetch(`/api/clients/${record._id}?section=${section}`, {
+        const res = await fetch(`/api/clients/${record._id}`, {
           method: 'PUT',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify(toSend),
         });
         if (res.ok) {
           const saved = await res.json();
-          setClients((prev) =>
-            prev.map((item) => (item._id === saved._id ? saved : item))
-          );
-          toast.success(`${record.client} a été mis à jour avec succès`);
-          fetchSectionCounts(); // Refresh section counts
+          if (oldSection !== newSection) {
+            toast.success(`${record.client} a été déplacé vers ${newSection.replace('-', ' ').toUpperCase()}`);
+            fetchSectionCounts();
+          } else {
+            setClients((prev) =>
+              prev.map((item) => (item._id === saved._id ? saved : item))
+            );
+            toast.success(`${record.client} a été mis à jour avec succès`);
+          }
         } else {
-          // Revert on error
           setClients(previousClients);
           const error = await res.json();
           toast.error(`Impossible de mettre à jour ${record.client}: ${error.error || 'Erreur inconnue'}`);
         }
       } catch (error) {
-        // Revert on error
         setClients(previousClients);
         console.error('Erreur lors de la mise à jour:', error);
         toast.error('Erreur de connexion au serveur');
       }
-    } else {
-      // Cas création - Optimistic UI
-      const previousClients = [...clients];
-      const tempId = `temp-${Date.now()}`;
-      const optimisticRecord = { ...toSave, _id: tempId };
-      setClients((prev) => [...prev, optimisticRecord]);
-      
-      const { id, _id, ...toSend } = toSave;
-      try {
-        const res = await fetch('/api/clients', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify(toSend),
-        });
-        if (res.ok) {
-          const saved = await res.json();
-          setClients((prev) =>
-            prev.map((item) => (item._id === tempId ? saved : item))
-          );
-          toast.success(`${saved.client} a été créé avec succès`);
-          fetchSectionCounts(); // Refresh section counts
-        } else {
-          // Revert on error
-          setClients(previousClients);
-          const error = await res.json();
-          toast.error(`Impossible de créer le dossier: ${error.error || 'Erreur inconnue'}`);
-        }
-      } catch (error) {
-        // Revert on error
+
+      return;
+    }
+
+    const previousClients = [...clients];
+    const tempId = `temp-${Date.now()}`;
+    const optimisticRecord = { ...toSave, _id: tempId };
+    setClients((prev) => [...prev, optimisticRecord]);
+
+    const { id, _id, ...toSend } = toSave;
+    try {
+      const res = await fetch('/api/clients', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(toSend),
+      });
+      if (res.ok) {
+        const saved = await res.json();
+        setClients((prev) =>
+          prev.map((item) => (item._id === tempId ? saved : item))
+        );
+        toast.success(`${saved.client} a été créé avec succès`);
+        fetchSectionCounts();
+      } else {
         setClients(previousClients);
-        console.error('Erreur lors de la création:', error);
-        toast.error('Erreur de connexion au serveur');
+        const error = await res.json();
+        toast.error(`Impossible de créer le dossier: ${error.error || 'Erreur inconnue'}`);
       }
+    } catch (error) {
+      setClients(previousClients);
+      console.error('Erreur lors de la création:', error);
+      toast.error('Erreur de connexion au serveur');
     }
   };
 
@@ -390,7 +341,7 @@ export default function ClientSection({ section }: ClientSectionProps) {
       
       try {
         const res = await fetch(
-          `/api/clients/${_id}?section=${section}`,
+          `/api/clients/${_id}`,
           {
             method: 'DELETE',
           }

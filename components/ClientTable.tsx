@@ -172,7 +172,7 @@ export default function ClientTable({
   } else if (isConsuelEnCours) {
     columns.push(
       { key: 'client', label: 'Client' },
-      { key: 'pvChantier', label: 'PV Chantier' },
+      { key: 'pvChantierDate', label: 'PV Chantier' },
       { key: 'causeNonPresence', label: 'Cause de non présence Consuel' },
       { key: 'prestataire', label: 'Prestataire' },
       { key: 'etatActuel', label: 'Etat Actuel' },
@@ -184,7 +184,7 @@ export default function ClientTable({
   } else if (isConsuelFinalise) {
     columns.push(
       { key: 'client', label: 'Nom' },
-      { key: 'pvChantier', label: 'PV Chantier' },
+      { key: 'pvChantierDate', label: 'PV Chantier' },
       { key: 'causeNonPresence', label: 'Cause de non présence Consuel' },
       { key: 'prestataire', label: 'Prestataire' },
       { key: 'etatActuel', label: 'Etat Actuel' },
@@ -501,7 +501,8 @@ export default function ClientTable({
                         col.key === 'dateEstimative' ||
                         col.key === 'dateDerniereDemarche' ||
                         col.key === 'dateMiseEnService' ||
-                        col.key === 'datePV' ? (
+                        col.key === 'datePV' ||
+                        col.key === 'pvChantierDate' ? (
                           formatDateFR(item[col.key] as string)
                         ) : col.key === 'pvChantier' && isInstallation && item.pvChantier ? (
                           <span className="font-medium text-primary">{item.pvChantier}</span>
