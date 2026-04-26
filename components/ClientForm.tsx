@@ -437,36 +437,36 @@ export default function ClientForm({
       />
       <div
         ref={modalRef}
-        className="relative bg-gradient-to-br from-white to-gray-50 dark:from-gray-900 dark:to-gray-800 rounded-xl shadow-2xl w-full max-w-5xl max-h-[90vh] overflow-hidden border border-gray-200 dark:border-gray-700 flex flex-col animate-in zoom-in-95 duration-300"
+        className="relative bg-white dark:bg-gray-900 rounded-lg shadow-lg w-full max-w-3xl max-h-[95vh] overflow-hidden border border-gray-200 dark:border-gray-700 flex flex-col animate-in zoom-in-95 duration-200"
         role="dialog"
         aria-modal="true"
         aria-label={client ? 'Modifier le dossier' : 'Ajouter un dossier'}
       >
-        <div className="flex items-center justify-between px-4 py-3 border-b border-gray-200 dark:border-gray-700 bg-gradient-to-r from-gray-50 to-gray-100 dark:from-gray-800 dark:to-gray-900">
-          <div className="flex items-center gap-3">
-            <div className="p-2 rounded-lg bg-gradient-to-br from-amber-500 to-orange-600 text-white shadow-md shadow-amber-500/30">
+        <div className="flex items-center justify-between px-3 py-2 border-b border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800">
+          <div className="flex items-center gap-2">
+            <div className="p-1.5 rounded bg-amber-500 text-white">
               {getSectionIcon()}
             </div>
             <div>
-              <h2 className="text-lg font-bold bg-gradient-to-r from-gray-900 to-gray-700 dark:from-white dark:to-gray-300 bg-clip-text text-transparent">
+              <h2 className="text-sm font-semibold text-gray-900 dark:text-white">
                 {client ? 'Modifier' : 'Ajouter'}
               </h2>
-              <Badge className={`mt-0.5 text-xs ${getSectionColor()}`}>
+              <Badge className={`mt-0.5 text-[10px] ${getSectionColor()}`}>
                 {section.replace('-', ' ').toUpperCase()}
               </Badge>
             </div>
           </div>
           <button
             onClick={onClose}
-            className="p-2 rounded-lg hover:bg-white dark:hover:bg-gray-700 transition-all duration-200 hover:scale-110 hover:shadow-md group border border-transparent hover:border-gray-200 dark:hover:border-gray-600"
+            className="p-1.5 rounded hover:bg-white dark:hover:bg-gray-700 transition-all duration-150 group border border-transparent hover:border-gray-200 dark:hover:border-gray-600"
           >
-            <X className="w-4 h-4 text-gray-500 dark:text-gray-400 group-hover:text-red-500 dark:group-hover:text-red-400 transition-colors" />
+            <X className="w-3.5 h-3.5 text-gray-500 dark:text-gray-400 group-hover:text-red-500 dark:group-hover:text-red-400 transition-colors" />
           </button>
         </div>
 
-        <div className="flex-1 overflow-y-auto px-4 py-3 min-h-0">
-          <div className="sticky top-0 z-10 mb-3 bg-white/95 dark:bg-gray-900/95 backdrop-blur-md rounded-lg border border-gray-200/80 dark:border-gray-700/80 p-2 shadow-sm">
-            <div className="flex flex-wrap gap-1.5">
+        <div className="flex-1 overflow-y-auto px-3 py-2 min-h-0">
+          <div className="sticky top-0 z-10 mb-2 bg-white/95 dark:bg-gray-900/95 backdrop-blur-sm rounded border border-gray-200/80 dark:border-gray-700/80 p-1.5 shadow-sm">
+            <div className="flex flex-wrap gap-1">
               <Button
                 type="button"
                 variant="ghost"
@@ -505,13 +505,13 @@ export default function ClientForm({
               </Button>
             </div>
           </div>
-          <form onSubmit={handleSubmit} className="space-y-4">
+          <form onSubmit={handleSubmit} className="space-y-3">
             {section.startsWith('consuel') &&
               form.etatActuel === 'Consuel OK' && (
-                <div className="bg-primary-50 dark:bg-primary-900/20 border border-primary-200 dark:border-primary-800 rounded-lg p-2.5">
-                  <div className="flex items-center gap-2">
-                    <Info className="h-4 w-4 text-primary-600 dark:text-primary-400" />
-                    <span className="text-xs font-semibold text-primary-800 dark:text-primary-200">
+                <div className="bg-primary-50 dark:bg-primary-900/20 border border-primary-200 dark:border-primary-800 rounded p-1.5">
+                  <div className="flex items-center gap-1.5">
+                    <Info className="h-3.5 w-3.5 text-primary-600 dark:text-primary-400" />
+                    <span className="text-[11px] font-semibold text-primary-800 dark:text-primary-200">
                       Déplacement vers "Consuel Finalisé"
                     </span>
                   </div>
@@ -519,10 +519,10 @@ export default function ClientForm({
               )}
             {section === 'raccordement' &&
               form.raccordement === 'Mise en service' && (
-                <div className="bg-success-50 dark:bg-success-900/20 border border-success-200 dark:border-success-800 rounded-lg p-2.5">
-                  <div className="flex items-center gap-2">
-                    <CheckCircle className="h-4 w-4 text-success-600 dark:text-success-400" />
-                    <span className="text-xs font-semibold text-success-800 dark:text-success-200">
+                <div className="bg-success-50 dark:bg-success-900/20 border border-success-200 dark:border-success-800 rounded p-1.5">
+                  <div className="flex items-center gap-1.5">
+                    <CheckCircle className="h-3.5 w-3.5 text-success-600 dark:text-success-400" />
+                    <span className="text-[11px] font-semibold text-success-800 dark:text-success-200">
                       Déplacement vers "Raccordement MES"
                     </span>
                   </div>
@@ -532,15 +532,15 @@ export default function ClientForm({
             {!isDaact && (
               <div
                 id="form-general"
-                className="bg-gradient-to-br from-gray-50 to-white dark:from-gray-800 dark:to-gray-900 rounded-xl p-4 border border-gray-200 dark:border-gray-700 shadow-sm hover:shadow-md transition-shadow duration-300"
+                className="bg-gray-50 dark:bg-gray-800 rounded-lg p-3 border border-gray-200 dark:border-gray-700 shadow-sm"
               >
-                <h3 className="text-sm font-bold text-gray-900 dark:text-white mb-4 flex items-center gap-2">
-                  <div className="p-1.5 rounded-lg bg-gradient-to-br from-blue-500 to-blue-600 text-white shadow-md">
-                    <User className="h-3.5 w-3.5" weight="bold" />
+                <h3 className="text-xs font-semibold text-gray-900 dark:text-white mb-3 flex items-center gap-1.5">
+                  <div className="p-1 rounded bg-blue-500 text-white">
+                    <User className="h-3 w-3" weight="bold" />
                   </div>
                   Informations Générales
                 </h3>
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
                   {!isDp && (
                     <Select
                       label="Financement *"
@@ -585,15 +585,15 @@ export default function ClientForm({
             {isDp && (
               <div
                 id="form-workflow"
-                className="bg-gradient-to-br from-amber-50 to-orange-50 dark:from-gray-800 dark:to-gray-900 rounded-xl p-4 border border-amber-200 dark:border-gray-700 shadow-sm hover:shadow-md transition-shadow duration-300"
+                className="bg-amber-50 dark:bg-gray-800 rounded-lg p-3 border border-amber-200 dark:border-gray-700 shadow-sm"
               >
-                <h3 className="text-sm font-bold text-gray-900 dark:text-white mb-4 flex items-center gap-2">
-                  <div className="p-1.5 rounded-lg bg-gradient-to-br from-amber-500 to-orange-600 text-white shadow-md">
-                    <Calendar className="h-3.5 w-3.5" weight="bold" />
+                <h3 className="text-xs font-semibold text-gray-900 dark:text-white mb-3 flex items-center gap-1.5">
+                  <div className="p-1 rounded bg-amber-500 text-white">
+                    <Calendar className="h-3 w-3" weight="bold" />
                   </div>
                   Dates et financement
                 </h3>
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
                   <DatePicker
                     label="Date d'envoi"
                     value={form.dateEnvoi}
@@ -626,15 +626,15 @@ export default function ClientForm({
             {isDp && (
               <div
                 id="form-details"
-                className="bg-gradient-to-br from-purple-50 to-pink-50 dark:from-gray-800 dark:to-gray-900 rounded-xl p-4 border border-purple-200 dark:border-gray-700 shadow-sm hover:shadow-md transition-shadow duration-300"
+                className="bg-purple-50 dark:bg-gray-800 rounded-lg p-3 border border-purple-200 dark:border-gray-700 shadow-sm"
               >
-                <h3 className="text-sm font-bold text-gray-900 dark:text-white mb-4 flex items-center gap-2">
-                  <div className="p-1.5 rounded-lg bg-gradient-to-br from-purple-500 to-pink-600 text-white shadow-md">
-                    <Gear className="h-3.5 w-3.5" weight="bold" />
+                <h3 className="text-xs font-semibold text-gray-900 dark:text-white mb-3 flex items-center gap-1.5">
+                  <div className="p-1 rounded bg-purple-500 text-white">
+                    <Gear className="h-3 w-3" weight="bold" />
                   </div>
                   Détails du projet
                 </h3>
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
                   <Input
                     label="Numéro DP"
                     value={form.noDp}
@@ -684,15 +684,15 @@ export default function ClientForm({
             {isInstallation && (
               <div
                 id="form-installation"
-                className="bg-gradient-to-br from-green-50 to-emerald-50 dark:from-gray-800 dark:to-gray-900 rounded-xl p-4 border border-green-200 dark:border-gray-700 shadow-sm hover:shadow-md transition-shadow duration-300"
+                className="bg-green-50 dark:bg-gray-800 rounded-lg p-3 border border-green-200 dark:border-gray-700 shadow-sm"
               >
-                <h3 className="text-sm font-bold text-gray-900 dark:text-white mb-4 flex items-center gap-2">
-                  <div className="p-1.5 rounded-lg bg-gradient-to-br from-green-500 to-emerald-600 text-white shadow-md">
-                    <House className="h-3.5 w-3.5" weight="bold" />
+                <h3 className="text-xs font-semibold text-gray-900 dark:text-white mb-3 flex items-center gap-1.5">
+                  <div className="p-1 rounded bg-green-500 text-white">
+                    <House className="h-3 w-3" weight="bold" />
                   </div>
                   Détails Installation
                 </h3>
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
                   <Select
                     label="Statut"
                     value={form.statut}
@@ -743,14 +743,14 @@ export default function ClientForm({
             )}
 
             {isConsuel && (
-              <div className="bg-gradient-to-br from-yellow-50 to-amber-50 dark:from-gray-800 dark:to-gray-900 rounded-xl p-4 border border-yellow-200 dark:border-gray-700 shadow-sm hover:shadow-md transition-shadow duration-300">
-                <h3 className="text-sm font-bold text-gray-900 dark:text-white mb-4 flex items-center gap-2">
-                  <div className="p-1.5 rounded-lg bg-gradient-to-br from-yellow-500 to-amber-600 text-white shadow-md">
-                    <Lightning className="h-3.5 w-3.5" weight="bold" />
+              <div className="bg-yellow-50 dark:bg-gray-800 rounded-lg p-3 border border-yellow-200 dark:border-gray-700 shadow-sm">
+                <h3 className="text-xs font-semibold text-gray-900 dark:text-white mb-3 flex items-center gap-1.5">
+                  <div className="p-1 rounded bg-yellow-500 text-white">
+                    <Lightning className="h-3 w-3" weight="bold" />
                   </div>
                   Détails Consuel
                 </h3>
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
                   <DatePicker
                     label="PV Chantier"
                     value={form.pvChantierDate}
@@ -823,9 +823,9 @@ export default function ClientForm({
             )}
 
             {(isConsuel || isRaccordement || isRaccordementMes) && !isDp && (
-              <div className="bg-gray-50 dark:bg-gray-800 rounded-lg p-3 border border-gray-200 dark:border-gray-700">
-                <h3 className="text-sm font-bold text-gray-900 dark:text-white mb-3 flex items-center gap-2">
-                  <FileText className="h-4 w-4 text-primary-500" />
+              <div className="bg-gray-50 dark:bg-gray-800 rounded-lg p-2.5 border border-gray-200 dark:border-gray-700">
+                <h3 className="text-xs font-semibold text-gray-900 dark:text-white mb-2.5 flex items-center gap-1.5">
+                  <FileText className="h-3.5 w-3.5 text-primary-500" />
                   Commentaires
                 </h3>
                 <Input
@@ -839,15 +839,15 @@ export default function ClientForm({
             )}
 
             {isRaccordement && (
-              <div className="bg-gray-50 dark:bg-gray-800 rounded-lg p-3 border border-gray-200 dark:border-gray-700">
-                <h3 className="text-sm font-bold text-gray-900 dark:text-white mb-3 flex items-center gap-2">
+              <div className="bg-gray-50 dark:bg-gray-800 rounded-lg p-2.5 border border-gray-200 dark:border-gray-700">
+                <h3 className="text-xs font-semibold text-gray-900 dark:text-white mb-2.5 flex items-center gap-1.5">
                   <Buildings
-                    className="h-4 w-4 text-primary-500"
+                    className="h-3.5 w-3.5 text-primary-500"
                     weight="bold"
                   />
                   Raccordement
                 </h3>
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
                   <Select
                     label="Type de consuel demandé"
                     value={form.typeConsuel}
@@ -902,13 +902,13 @@ export default function ClientForm({
             )}
 
             {isRaccordementMes && (
-              <div className="bg-gray-50 dark:bg-gray-800 rounded-lg p-3 border border-gray-200 dark:border-gray-700">
-                <h3 className="text-sm font-bold text-gray-900 dark:text-white mb-3 flex items-center gap-2">
-                  <House className="h-4 w-4 text-primary-500" weight="bold" />
+              <div className="bg-gray-50 dark:bg-gray-800 rounded-lg p-2.5 border border-gray-200 dark:border-gray-700">
+                <h3 className="text-xs font-semibold text-gray-900 dark:text-white mb-2.5 flex items-center gap-1.5">
+                  <House className="h-3.5 w-3.5 text-primary-500" weight="bold" />
                   Mise en service
                 </h3>
 
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
                   <Input
                     label="Numéro de contrat"
                     value={form.numeroContrat}
@@ -933,12 +933,12 @@ export default function ClientForm({
             )}
 
             {isDaact && (
-              <div className="bg-gray-50 dark:bg-gray-800 rounded-lg p-3 border border-gray-200 dark:border-gray-700">
-                <h3 className="text-sm font-bold text-gray-900 dark:text-white mb-3 flex items-center gap-2">
-                  <FileText className="h-4 w-4 text-primary-500" />
+              <div className="bg-gray-50 dark:bg-gray-800 rounded-lg p-2.5 border border-gray-200 dark:border-gray-700">
+                <h3 className="text-xs font-semibold text-gray-900 dark:text-white mb-2.5 flex items-center gap-1.5">
+                  <FileText className="h-3.5 w-3.5 text-primary-500" />
                   DAACT
                 </h3>
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
                   <AutocompleteInput
                     label="Client"
                     value={form.client}
@@ -990,16 +990,16 @@ export default function ClientForm({
 
             <div
               id="form-footer"
-              className="flex justify-between items-center pt-4 border-t border-gray-200 dark:border-gray-700"
+              className="flex justify-between items-center pt-3 border-t border-gray-200 dark:border-gray-700"
             >
-              <div className="text-xs text-gray-500 dark:text-gray-400">
+              <div className="text-[10px] text-gray-500 dark:text-gray-400">
                 {form.statut === 'Accord favorable' && (
-                  <Badge className="bg-green-50 text-green-700 border-green-200 dark:bg-green-900/30 dark:text-green-400 dark:border-green-700 animate-pulse text-xs">
+                  <Badge className="bg-green-50 text-green-700 border-green-200 dark:bg-green-900/30 dark:text-green-400 dark:border-green-700 animate-pulse text-[10px]">
                     ⚠️ Déplacement vers "DP Accordés"
                   </Badge>
                 )}
                 {form.statut === 'Refus' && (
-                  <Badge className="bg-red-50 text-red-700 border-red-200 dark:bg-red-900/30 dark:text-red-400 dark:border-red-700 animate-pulse text-xs">
+                  <Badge className="bg-red-50 text-red-700 border-red-200 dark:bg-red-900/30 dark:text-red-400 dark:border-red-700 animate-pulse text-[10px]">
                     ⚠️ Déplacement vers "DP Refus"
                   </Badge>
                 )}
@@ -1012,7 +1012,7 @@ export default function ClientForm({
                   onClick={onClose}
                   disabled={isSubmitting}
                   icon={<X className="h-3 w-3" />}
-                  className="px-3 py-1.5 text-xs"
+                  className="px-2.5 py-1.5 text-[11px]"
                 >
                   Annuler
                 </Button>
@@ -1024,7 +1024,7 @@ export default function ClientForm({
                       <FloppyDisk className="h-3 w-3" weight="bold" />
                     )
                   }
-                  className="px-3 py-1.5 text-xs"
+                  className="px-2.5 py-1.5 text-[11px]"
                 >
                   {isSubmitting
                     ? 'Enregistrement...'
