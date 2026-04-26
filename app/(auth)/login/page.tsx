@@ -1,7 +1,7 @@
 ﻿'use client';
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { Envelope, Lock, Warning, Buildings } from '@phosphor-icons/react';
+import { Envelope, Lock, Warning, Buildings, Eye, EyeSlash } from '@phosphor-icons/react';
 import Input from '@/components/ui/Input';
 import Button from '@/components/ui/Button';
 
@@ -10,6 +10,7 @@ export default function LoginPage() {
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
   const [isLoading, setIsLoading] = useState(false);
+  const [showPassword, setShowPassword] = useState(false);
   const router = useRouter();
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -57,8 +58,9 @@ export default function LoginPage() {
               icon={<Envelope className="h-4 w-4" weight="bold" />}
               required
             />
+            <div className="relative">
             <Input
-              type="password"
+              type={showPassword ? 'text' : 'password'}
               label="Mot de passe"
               placeholder="••••••••"
               value={password}
@@ -66,6 +68,19 @@ export default function LoginPage() {
               icon={<Lock className="h-4 w-4" weight="bold" />}
               required
             />
+            <button
+              type="button"
+              onClick={() => setShowPassword(!showPassword)}
+              className="absolute right-3 top-9 text-gray-400 hover:text-gray-600 dark:text-gray-500 dark:hover:text-gray-300 transition-colors"
+              aria-label={showPassword ? 'Masquer le mot de passe' : 'Afficher le mot de passe'}
+            >
+              {showPassword ? (
+                <EyeSlash className="h-5 w-5" weight="bold" />
+              ) : (
+                <Eye className="h-5 w-5" weight="bold" />
+              )}
+            </button>
+          </div>
 
             {error && (
               <div className="border border-red-300 bg-red-50 dark:bg-red-900/20 rounded-lg p-3 text-sm text-red-700 dark:text-red-300 flex items-center gap-2">
