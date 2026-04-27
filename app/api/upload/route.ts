@@ -40,17 +40,18 @@ export async function POST(request: Request) {
 
     await connectDB();
 
-    // Find client by name and section
-    const client = await Client.findOne({ 
+    // Find client by name and section, or create if doesn't exist
+    let client = await Client.findOne({ 
       client: clientName,
       section: section 
     });
 
     if (!client) {
-      return NextResponse.json(
-        { error: 'Client non trouvé' },
-        { status: 404 }
-      );
+      // Create client if it doesn't exist
+      client = await Client.create({
+        client: clientName,
+        section: section,
+      });
     }
 
     // Convert files to base64 and store in clients_files collection
