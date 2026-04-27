@@ -27,14 +27,11 @@ import {
   Info,
   CheckCircle,
   CaretDown,
-  CaretUp,
   MapPin,
   Shield,
   Globe,
   Key,
   Clock,
-  Phone,
-  Envelope,
   House,
   Gear,
 } from '@phosphor-icons/react';
@@ -366,6 +363,7 @@ export default function ClientForm({
       const formToSend: ClientRecord = {
         ...rest,
         section: finalSection,
+        statut: form.statut ?? '',
         dateEnvoi: formatDateInput(form.dateEnvoi ?? ''),
         dateEstimative: formatDateInput(form.dateEstimative ?? ''),
         pvChantier: form.pvChantier ?? '',
@@ -446,7 +444,7 @@ export default function ClientForm({
       >
         <div className="flex items-center justify-between px-3 py-2 border-b border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800">
           <div className="flex items-center gap-2">
-            <div className="p-1.5 rounded bg-amber-500 text-white">
+            <div className="p-1.5 rounded bg-gradient-to-r from-cyan-500 to-blue-500 text-white">
               {getSectionIcon()}
             </div>
             <div>
@@ -474,7 +472,7 @@ export default function ClientForm({
                 variant="ghost"
                 size="sm"
                 onClick={() => scrollToSection('form-general')}
-                className="hover:bg-amber-50 dark:hover:bg-amber-900/20 hover:text-amber-600 dark:hover:text-amber-400 transition-all px-3 py-1.5 text-xs"
+                className="hover:bg-cyan-50 dark:hover:bg-cyan-900/20 hover:text-cyan-600 dark:hover:text-cyan-400 transition-all px-3 py-1.5 text-xs"
               >
                 <User className="w-3 h-3 mr-1" /> Général
               </Button>
@@ -483,7 +481,7 @@ export default function ClientForm({
                 variant="ghost"
                 size="sm"
                 onClick={() => scrollToSection('form-workflow')}
-                className="hover:bg-amber-50 dark:hover:bg-amber-900/20 hover:text-amber-600 dark:hover:text-amber-400 transition-all px-3 py-1.5 text-xs"
+                className="hover:bg-cyan-50 dark:hover:bg-cyan-900/20 hover:text-cyan-600 dark:hover:text-cyan-400 transition-all px-3 py-1.5 text-xs"
               >
                 <Clock className="w-3 h-3 mr-1" /> Workflow
               </Button>
@@ -492,7 +490,7 @@ export default function ClientForm({
                 variant="ghost"
                 size="sm"
                 onClick={() => scrollToSection('form-details')}
-                className="hover:bg-amber-50 dark:hover:bg-amber-900/20 hover:text-amber-600 dark:hover:text-amber-400 transition-all px-3 py-1.5 text-xs"
+                className="hover:bg-cyan-50 dark:hover:bg-cyan-900/20 hover:text-cyan-600 dark:hover:text-cyan-400 transition-all px-3 py-1.5 text-xs"
               >
                 <FileText className="w-3 h-3 mr-1" /> Détails
               </Button>
@@ -501,7 +499,7 @@ export default function ClientForm({
                 variant="ghost"
                 size="sm"
                 onClick={() => scrollToSection('form-footer')}
-                className="hover:bg-amber-50 dark:hover:bg-amber-900/20 hover:text-amber-600 dark:hover:text-amber-400 transition-all px-3 py-1.5 text-xs"
+                className="hover:bg-cyan-50 dark:hover:bg-cyan-900/20 hover:text-cyan-600 dark:hover:text-cyan-400 transition-all px-3 py-1.5 text-xs"
               >
                 <Gear className="w-3 h-3 mr-1" /> Actions
               </Button>
@@ -534,10 +532,10 @@ export default function ClientForm({
             {!isDaact && (
               <div
                 id="form-general"
-                className="bg-gray-50 dark:bg-gray-800 rounded-lg p-3 border border-gray-200 dark:border-gray-700 shadow-sm"
+                className="bg-gradient-to-br from-slate-50 to-slate-100 dark:from-slate-800/50 dark:to-slate-900/50 backdrop-blur-sm rounded-xl p-4 border border-slate-200 dark:border-slate-700 shadow-lg hover:shadow-xl transition-all duration-300"
               >
-                <h3 className="text-xs font-semibold text-gray-900 dark:text-white mb-3 flex items-center gap-1.5">
-                  <div className="p-1 rounded bg-blue-500 text-white">
+                <h3 className="text-xs font-semibold text-slate-900 dark:text-white mb-4 flex items-center gap-2">
+                  <div className="p-1.5 rounded-lg bg-gradient-to-r from-cyan-500 to-blue-500 text-white shadow-md shadow-cyan-500/30">
                     <User className="h-3 w-3" weight="bold" />
                   </div>
                   Informations Générales
@@ -587,10 +585,10 @@ export default function ClientForm({
             {isDp && (
               <div
                 id="form-workflow"
-                className="bg-amber-50 dark:bg-gray-800 rounded-lg p-3 border border-amber-200 dark:border-gray-700 shadow-sm"
+                className="bg-gradient-to-br from-cyan-50 to-blue-50 dark:from-cyan-900/20 dark:to-blue-900/20 backdrop-blur-sm rounded-xl p-4 border border-cyan-200 dark:border-cyan-800 shadow-lg hover:shadow-xl transition-all duration-300"
               >
-                <h3 className="text-xs font-semibold text-gray-900 dark:text-white mb-3 flex items-center gap-1.5">
-                  <div className="p-1 rounded bg-amber-500 text-white">
+                <h3 className="text-xs font-semibold text-slate-900 dark:text-white mb-4 flex items-center gap-2">
+                  <div className="p-1.5 rounded-lg bg-gradient-to-r from-cyan-500 to-blue-500 text-white shadow-md shadow-cyan-500/30">
                     <Calendar className="h-3 w-3" weight="bold" />
                   </div>
                   Dates et financement
@@ -628,10 +626,10 @@ export default function ClientForm({
             {isDp && (
               <div
                 id="form-details"
-                className="bg-purple-50 dark:bg-gray-800 rounded-lg p-3 border border-purple-200 dark:border-gray-700 shadow-sm"
+                className="bg-gradient-to-br from-violet-50 to-purple-50 dark:from-violet-900/20 dark:to-purple-900/20 backdrop-blur-sm rounded-xl p-4 border border-violet-200 dark:border-violet-800 shadow-lg hover:shadow-xl transition-all duration-300"
               >
-                <h3 className="text-xs font-semibold text-gray-900 dark:text-white mb-3 flex items-center gap-1.5">
-                  <div className="p-1 rounded bg-purple-500 text-white">
+                <h3 className="text-xs font-semibold text-slate-900 dark:text-white mb-4 flex items-center gap-2">
+                  <div className="p-1.5 rounded-lg bg-gradient-to-r from-violet-500 to-purple-500 text-white shadow-md shadow-violet-500/30">
                     <Gear className="h-3 w-3" weight="bold" />
                   </div>
                   Détails du projet
@@ -685,9 +683,9 @@ export default function ClientForm({
             )}
 
             {isDp && (
-              <div className="bg-blue-50 dark:bg-gray-800 rounded-lg p-3 border border-blue-200 dark:border-gray-700 shadow-sm">
-                <h3 className="text-xs font-semibold text-gray-900 dark:text-white mb-3 flex items-center gap-1.5">
-                  <div className="p-1 rounded bg-blue-500 text-white">
+              <div className="bg-gradient-to-br from-blue-50 to-indigo-50 dark:from-blue-900/20 dark:to-indigo-900/20 backdrop-blur-sm rounded-xl p-4 border border-blue-200 dark:border-blue-800 shadow-lg hover:shadow-xl transition-all duration-300">
+                <h3 className="text-xs font-semibold text-slate-900 dark:text-white mb-4 flex items-center gap-2">
+                  <div className="p-1.5 rounded-lg bg-gradient-to-r from-blue-500 to-indigo-500 text-white shadow-md shadow-blue-500/30">
                     <FileText className="h-3 w-3" weight="bold" />
                   </div>
                   Documents
@@ -703,10 +701,10 @@ export default function ClientForm({
             {isInstallation && (
               <div
                 id="form-installation"
-                className="bg-green-50 dark:bg-gray-800 rounded-lg p-3 border border-green-200 dark:border-gray-700 shadow-sm"
+                className="bg-gradient-to-br from-emerald-50 to-green-50 dark:from-emerald-900/20 dark:to-green-900/20 backdrop-blur-sm rounded-xl p-4 border border-emerald-200 dark:border-emerald-800 shadow-lg hover:shadow-xl transition-all duration-300"
               >
-                <h3 className="text-xs font-semibold text-gray-900 dark:text-white mb-3 flex items-center gap-1.5">
-                  <div className="p-1 rounded bg-green-500 text-white">
+                <h3 className="text-xs font-semibold text-slate-900 dark:text-white mb-4 flex items-center gap-2">
+                  <div className="p-1.5 rounded-lg bg-gradient-to-r from-emerald-500 to-green-500 text-white shadow-md shadow-emerald-500/30">
                     <House className="h-3 w-3" weight="bold" />
                   </div>
                   Détails Installation
@@ -762,9 +760,9 @@ export default function ClientForm({
             )}
 
             {isConsuel && (
-              <div className="bg-yellow-50 dark:bg-gray-800 rounded-lg p-3 border border-yellow-200 dark:border-gray-700 shadow-sm">
-                <h3 className="text-xs font-semibold text-gray-900 dark:text-white mb-3 flex items-center gap-1.5">
-                  <div className="p-1 rounded bg-yellow-500 text-white">
+              <div className="bg-gradient-to-br from-violet-50 to-purple-50 dark:from-violet-900/20 dark:to-purple-900/20 backdrop-blur-sm rounded-xl p-4 border border-violet-200 dark:border-violet-800 shadow-lg hover:shadow-xl transition-all duration-300">
+                <h3 className="text-xs font-semibold text-slate-900 dark:text-white mb-4 flex items-center gap-2">
+                  <div className="p-1.5 rounded-lg bg-gradient-to-r from-violet-500 to-purple-500 text-white shadow-md shadow-violet-500/30">
                     <Lightning className="h-3 w-3" weight="bold" />
                   </div>
                   Détails Consuel
@@ -903,16 +901,27 @@ export default function ClientForm({
                     }
                     options={[
                       {
-                        value: 'Demande à effectuer',
-                        label: 'Demande à effectuer',
-                      },
-                      {
                         value: 'Demande transmise',
                         label: 'Demande transmise',
+                      },
+                      {
+                        value: 'Demande à effectuer',
+                        label: 'Demande à effectuer',
                       },
                       { value: 'Mise en service', label: 'Mise en service' },
                     ]}
                     placeholder="Sélectionner un raccordement"
+                  />
+                  <Select
+                    label="Statut"
+                    value={form.statut}
+                    onChange={(e) => handleChange('statut', e.target.value)}
+                    options={raccordementStatuts.map((s) => ({
+                      value: s,
+                      label: s,
+                    }))}
+                    placeholder="Sélectionner un statut"
+                    error={errors.statut}
                   />
                   <DatePicker
                     label="Date dernière démarche"
@@ -920,17 +929,8 @@ export default function ClientForm({
                     onChange={(value) =>
                       handleChange('dateDerniereDemarche', value)
                     }
-                    icon={<Calendar className="h-4 w-4" />}
-                    name="dateDerniereDemarche"
-                  />
-                  <DatePicker
-                    label="Date Estimatives"
-                    value={form.dateEstimative}
-                    onChange={(value) => handleChange('dateEstimative', value)}
                     icon={<Clock className="h-4 w-4" />}
-                    name="dateEstimative"
-                    disabled
-                    readOnly
+                    name="dateDerniereDemarche"
                   />
                 </div>
               </div>

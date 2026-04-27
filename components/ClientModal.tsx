@@ -19,8 +19,6 @@ import {
   Clock,
   Copy,
   Link,
-  Trash,
-  PencilSimple,
   Folder,
 } from '@phosphor-icons/react';
 import Badge from '@/components/ui/Badge';
@@ -205,28 +203,31 @@ export default function ClientModal({
       />
       <div
         ref={modalRef}
-        className="relative bg-primary backdrop-blur-xl rounded-lg shadow-md w-full max-w-4xl max-h-[90vh] overflow-hidden border border-primary flex flex-col"
+        className="relative bg-white dark:bg-slate-900 backdrop-blur-xl rounded-lg shadow-lg w-full max-w-4xl max-h-[95vh] overflow-hidden border border-slate-200 dark:border-slate-700 flex flex-col"
         role="dialog"
         aria-modal="true"
         aria-label={`Dossier ${selectedClient.client || 'client'}`}
       >
         {/* Header */}
-        <div className="flex items-center justify-between px-6 py-4 border-b border-primary bg-secondary">
-          <div className="flex items-center gap-4 flex-1">
-            <div className="p-3 rounded-lg bg-primary-500 text-white shadow-sm">
-              <User className="h-6 w-6" weight="bold" />
+        <div className="relative bg-gradient-to-r from-cyan-500 via-blue-500 to-violet-500 p-4 overflow-hidden">
+          <div className="absolute inset-0 bg-black/10" />
+          <div className="relative z-10 flex items-center gap-3 flex-1">
+            <div className="w-12 h-12 bg-white/20 backdrop-blur-md rounded-xl flex items-center justify-center border border-white/30 shadow-lg">
+              <User className="h-6 w-6 text-white" weight="bold" />
             </div>
             <div className="flex-1">
-              <h2 className="text-2xl font-bold text-gray-900 dark:text-white">
+              <h2 className="text-xl font-bold text-white">
                 {selectedClient.client}
               </h2>
-              <div className="flex items-center gap-2 mt-1">
-                <Badge className={getStatutBadgeColor(selectedClient.statut)}>
-                  {selectedClient.statut || 'Sans statut'}
-                </Badge>
-                {urgency && (
+              <div className="flex items-center gap-2 mt-0.5">
+                {!section.startsWith('consuel') && (
+                  <Badge className="bg-white/20 text-white border-white/30 backdrop-blur-sm text-xs">
+                    {selectedClient.statut || 'Sans statut'}
+                  </Badge>
+                )}
+                {urgency && !section.startsWith('consuel') && (
                   <Badge
-                    className={`${urgency.color.replace('from-', 'bg-').split(' ')[0]} text-white border-0`}
+                    className="bg-white/30 text-white border-white/40 backdrop-blur-sm shadow-lg text-xs"
                   >
                     {urgency.label} ({urgency.diffDays}j)
                   </Badge>
@@ -234,134 +235,158 @@ export default function ClientModal({
               </div>
             </div>
           </div>
-          <div className="flex items-center gap-2">
-            <button
-              onClick={() => onEdit(selectedClient)}
-              className="p-2 rounded-lg hover:bg-secondary transition-colors group"
-              title="Modifier"
-            >
-              <PencilSimple
-                className="w-5 h-5 text-gray-500 dark:text-gray-400 group-hover:text-blue-600 dark:group-hover:text-blue-400"
-                weight="bold"
-              />
-            </button>
-            {onDelete && (
-              <button
-                onClick={handleDelete}
-                className="p-2 rounded-lg hover:bg-secondary transition-colors group"
-                title="Supprimer"
-              >
-                <Trash
-                  className="w-5 h-5 text-gray-500 dark:text-gray-400 group-hover:text-red-600 dark:group-hover:text-red-400"
-                  weight="bold"
-                />
-              </button>
-            )}
-            <button
-              onClick={onClose}
-              className="p-3 rounded-lg hover:bg-secondary transition-all duration-200 hover:scale-[1.01] group"
-              title="Fermer"
-            >
-              <X
-                className="w-6 h-6 text-gray-500 dark:text-gray-400 group-hover:text-gray-700 dark:group-hover:text-gray-200"
-                weight="bold"
-              />
-            </button>
-          </div>
         </div>
 
         {/* Content */}
-        <div className="flex-1 overflow-y-auto px-8 py-6 min-h-0">
-          <div className="space-y-6">
+        <div className="flex-1 overflow-y-auto px-4 py-3 min-h-0">
+          <div className="space-y-4">
+            {/* KPI Cards */}
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
+              {urgency && !section.startsWith('consuel') && section !== 'dp-refuses' && (
+                <div className="bg-gradient-to-br from-cyan-50 to-blue-50 dark:from-cyan-900/20 dark:to-blue-900/20 rounded-lg p-3 border border-cyan-200 dark:border-cyan-800 shadow-md hover:shadow-lg transition-all duration-300">
+                  <div className="flex items-center gap-2 mb-1">
+                    <Clock className="h-3.5 w-3.5 text-cyan-600 dark:text-cyan-400" weight="bold" />
+                    <span className="text-[10px] font-semibold text-slate-600 dark:text-slate-400">Jours restants</span>
+                  </div>
+                  <div className={`text-xl font-bold ${urgency.urgent ? 'text-red-600 dark:text-red-400' : 'text-slate-900 dark:text-white'}`}>
+                    {urgency.diffDays}
+                  </div>
+                  <div className={`text-[10px] mt-0.5 ${urgency.urgent ? 'text-red-500' : 'text-slate-500'}`}>
+                    {urgency.label}
+                  </div>
+                </div>
+              )}
+              <div className="bg-gradient-to-br from-violet-50 to-purple-50 dark:from-violet-900/20 dark:to-purple-900/20 rounded-lg p-3 border border-violet-200 dark:border-violet-800 shadow-md hover:shadow-lg transition-all duration-300">
+                <div className="flex items-center gap-2 mb-1">
+                  <FileText className="h-3.5 w-3.5 text-violet-600 dark:text-violet-400" weight="bold" />
+                  <span className="text-[10px] font-semibold text-slate-600 dark:text-slate-400">Documents</span>
+                </div>
+                <div className="text-xl font-bold text-slate-900 dark:text-white">
+                  {clientFiles.length}
+                </div>
+                <div className="text-[10px] text-slate-500 mt-0.5">
+                  Fichiers
+                </div>
+              </div>
+              {selectedClient.dateEstimative && section !== 'consuel-finalise' && (
+                <div className="bg-gradient-to-br from-emerald-50 to-green-50 dark:from-emerald-900/20 dark:to-green-900/20 rounded-lg p-3 border border-emerald-200 dark:border-emerald-800 shadow-md hover:shadow-lg transition-all duration-300">
+                  <div className="flex items-center gap-2 mb-1">
+                    <Calendar className="h-3.5 w-3.5 text-emerald-600 dark:text-emerald-400" weight="bold" />
+                    <span className="text-[10px] font-semibold text-slate-600 dark:text-slate-400">{section === 'installation' ? 'Date de pose' : 'Date estimative'}</span>
+                  </div>
+                  <div className="text-sm font-bold text-slate-900 dark:text-white">
+                    {selectedClient.dateEstimative
+                      ? formatDateFR(selectedClient.dateEstimative)
+                      : 'N/A'}
+                  </div>
+                  <div className="text-[10px] text-slate-500 mt-0.5">
+                    Estimation
+                  </div>
+                </div>
+              )}
+              <div className="bg-gradient-to-br from-amber-50 to-yellow-50 dark:from-amber-900/20 dark:to-yellow-900/20 rounded-lg p-3 border border-amber-200 dark:border-amber-800 shadow-md hover:shadow-lg transition-all duration-300">
+                <div className="flex items-center gap-2 mb-1">
+                  <Lightning className="h-3.5 w-3.5 text-amber-600 dark:text-amber-400" weight="bold" />
+                  <span className="text-[10px] font-semibold text-slate-600 dark:text-slate-400">Financement</span>
+                </div>
+                <div className="text-lg font-bold text-slate-900 dark:text-white truncate">
+                  {selectedClient.financement || 'N/A'}
+                </div>
+                <div className="text-[10px] text-slate-500 mt-0.5">
+                  Type
+                </div>
+              </div>
+            </div>
+
             {/* Informations générales */}
-            <div className="bg-primary rounded-lg p-6 border border-primary shadow">
-              <h3 className="text-lg font-bold text-primary mb-6 flex items-center gap-2">
-                <User className="h-5 w-5 text-teal-500" weight="bold" />
+            <div className="bg-gradient-to-br from-slate-50 to-slate-100 dark:from-slate-800/50 dark:to-slate-900/50 backdrop-blur-sm rounded-lg p-4 border border-slate-200 dark:border-slate-700 shadow-md hover:shadow-lg transition-all duration-300">
+              <h3 className="text-sm font-bold text-slate-900 dark:text-white mb-3 flex items-center gap-2">
+                <User className="h-4 w-4 text-cyan-500" weight="bold" />
                 Informations générales
               </h3>
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
                 {selectedClient.prestataire && (
-                  <div className="flex items-center gap-3 p-4 bg-secondary rounded-lg border border-primary">
+                  <div className="flex items-center gap-2 p-3 bg-white dark:bg-slate-800 rounded-lg border border-slate-200 dark:border-slate-700">
                     <Buildings
-                      className="h-4 w-4 text-teal-500"
+                      className="h-3.5 w-3.5 text-cyan-500"
                       weight="bold"
                     />
                     <div>
-                      <p className="text-xs font-semibold text-tertiary">
+                      <p className="text-[10px] font-semibold text-slate-600 dark:text-slate-400">
                         Prestataire
                       </p>
-                      <p className="font-medium text-primary">
+                      <p className="text-sm font-medium text-slate-900 dark:text-white">
                         {selectedClient.prestataire}
                       </p>
                     </div>
                   </div>
                 )}
                 {selectedClient.dateEnvoi && (
-                  <div className="flex items-center gap-3 p-4 bg-secondary rounded-lg border border-primary">
-                    <Calendar className="h-4 w-4 text-teal-500" weight="bold" />
+                  <div className="flex items-center gap-2 p-3 bg-white dark:bg-slate-800 rounded-lg border border-slate-200 dark:border-slate-700">
+                    <Calendar className="h-3.5 w-3.5 text-cyan-500" weight="bold" />
                     <div>
-                      <p className="text-xs font-semibold text-tertiary">
+                      <p className="text-[10px] font-semibold text-slate-600 dark:text-slate-400">
                         Date d'envoi
                       </p>
-                      <p className="font-medium text-primary">
+                      <p className="text-sm font-medium text-slate-900 dark:text-white">
                         {formatDateFR(selectedClient.dateEnvoi)}
                       </p>
                     </div>
                   </div>
                 )}
-                {selectedClient.dateEstimative && (
-                  <div className="flex items-center gap-3 p-4 bg-secondary rounded-lg border border-primary">
-                    <Clock className="h-4 w-4 text-teal-500" weight="bold" />
+                {selectedClient.dateEstimative && section !== 'consuel-finalise' && (
+                  <div className="flex items-center gap-2 p-3 bg-white dark:bg-slate-800 rounded-lg border border-slate-200 dark:border-slate-700">
+                    <Clock className="h-3.5 w-3.5 text-cyan-500" weight="bold" />
                     <div>
-                      <p className="text-xs font-semibold text-tertiary">
-                        Date estimative
+                      <p className="text-[10px] font-semibold text-slate-600 dark:text-slate-400">
+                        {section === 'installation' ? 'Date de pose' : 'Date estimative'}
                       </p>
-                      <p className="font-medium text-primary">
+                      <p className="text-sm font-medium text-slate-900 dark:text-white">
                         {formatDateFR(selectedClient.dateEstimative)}
                       </p>
                     </div>
                   </div>
                 )}
                 {selectedClient.financement && (
-                  <div className="flex items-center gap-3 p-4 bg-secondary rounded-lg border border-primary">
+                  <div className="flex items-center gap-2 p-3 bg-white dark:bg-slate-800 rounded-lg border border-slate-200 dark:border-slate-700">
                     <Lightning
-                      className="h-4 w-4 text-teal-500"
+                      className="h-3.5 w-3.5 text-cyan-500"
                       weight="bold"
                     />
                     <div>
-                      <p className="text-xs font-semibold text-tertiary">
+                      <p className="text-[10px] font-semibold text-slate-600 dark:text-slate-400">
                         Financement
                       </p>
-                      <p className="font-medium text-primary">
+                      <p className="text-sm font-medium text-slate-900 dark:text-white">
                         {selectedClient.financement}
                       </p>
                     </div>
                   </div>
                 )}
                 {selectedClient.noDp && (
-                  <div className="flex items-center gap-3 p-4 bg-secondary rounded-lg border border-primary">
-                    <FileText className="h-4 w-4 text-teal-500" weight="bold" />
+                  <div className="flex items-center gap-2 p-3 bg-white dark:bg-slate-800 rounded-lg border border-slate-200 dark:border-slate-700">
+                    <FileText className="h-3.5 w-3.5 text-cyan-500" weight="bold" />
                     <div>
-                      <p className="text-xs font-semibold text-tertiary">
+                      <p className="text-[10px] font-semibold text-slate-600 dark:text-slate-400">
                         Numéro DP
                       </p>
-                      <p className="font-medium text-primary">
+                      <p className="text-sm font-medium text-slate-900 dark:text-white">
                         {selectedClient.noDp}
                       </p>
                     </div>
                   </div>
                 )}
                 {selectedClient.ville && (
-                  <div className="flex items-center gap-3 p-4 bg-secondary rounded-lg border border-primary">
+                  <div className="flex items-center gap-2 p-3 bg-white dark:bg-slate-800 rounded-lg border border-slate-200 dark:border-slate-700">
                     <Buildings
-                      className="h-4 w-4 text-teal-500"
+                      className="h-3.5 w-3.5 text-cyan-500"
                       weight="bold"
                     />
                     <div>
-                      <p className="text-xs font-semibold text-tertiary">
+                      <p className="text-[10px] font-semibold text-slate-600 dark:text-slate-400">
                         Ville
                       </p>
-                      <p className="font-medium text-primary">
+                      <p className="text-sm font-medium text-slate-900 dark:text-white">
                         {selectedClient.ville}
                       </p>
                     </div>
@@ -374,52 +399,52 @@ export default function ClientModal({
             {section.startsWith('dp') &&
               section !== 'dp-accordes' &&
               section !== 'dp-refuses' && (
-                <div className="bg-primary rounded-lg p-6 border border-primary shadow">
-                  <h3 className="text-lg font-bold text-primary mb-6 flex items-center gap-2">
-                    <Key className="h-5 w-5 text-teal-500" weight="bold" />
+                <div className="bg-white dark:bg-slate-800 rounded-lg p-4 border border-slate-200 dark:border-slate-700 shadow">
+                  <h3 className="text-sm font-bold text-slate-900 dark:text-white mb-3 flex items-center gap-2">
+                    <Key className="h-4 w-4 text-cyan-500" weight="bold" />
                     Identifiants Portail
                   </h3>
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
                     {selectedClient.portail && (
-                      <div className="flex items-center gap-3 p-4 bg-secondary rounded-lg border border-primary">
+                      <div className="flex items-center gap-2 p-3 bg-white dark:bg-slate-800 rounded-lg border border-slate-200 dark:border-slate-700">
                         <Buildings
-                          className="h-4 w-4 text-teal-500"
+                          className="h-3.5 w-3.5 text-cyan-500"
                           weight="bold"
                         />
                         <div className="flex-1">
-                          <p className="text-xs font-semibold text-tertiary">
+                          <p className="text-[10px] font-semibold text-slate-600 dark:text-slate-400">
                             Portail
                           </p>
-                          <p className="font-medium text-primary">
+                          <p className="text-sm font-medium text-slate-900 dark:text-white">
                             {selectedClient.portail}
                           </p>
                         </div>
                       </div>
                     )}
                     {selectedClient.identifiant && (
-                      <div className="flex items-center gap-3 p-4 bg-secondary rounded-lg border border-primary">
-                        <User className="h-4 w-4 text-teal-500" weight="bold" />
+                      <div className="flex items-center gap-2 p-3 bg-white dark:bg-slate-800 rounded-lg border border-slate-200 dark:border-slate-700">
+                        <User className="h-3.5 w-3.5 text-cyan-500" weight="bold" />
                         <div className="flex-1">
-                          <p className="text-xs font-semibold text-tertiary">
+                          <p className="text-[10px] font-semibold text-slate-600 dark:text-slate-400">
                             Identifiant
                           </p>
-                          <p className="font-medium text-primary">
+                          <p className="text-sm font-medium text-slate-900 dark:text-white">
                             {selectedClient.identifiant}
                           </p>
                         </div>
                       </div>
                     )}
                     {selectedClient.motDePasse && (
-                      <div className="flex items-center gap-3 p-4 bg-secondary rounded-lg border border-primary">
+                      <div className="flex items-center gap-2 p-3 bg-white dark:bg-slate-800 rounded-lg border border-slate-200 dark:border-slate-700">
                         <Key
-                          className="h-4 w-4 text-primary-500"
+                          className="h-3.5 w-3.5 text-cyan-500"
                           weight="bold"
                         />
                         <div className="flex-1">
-                          <p className="text-xs font-semibold text-gray-600 dark:text-gray-300">
+                          <p className="text-[10px] font-semibold text-slate-600 dark:text-slate-400">
                             Mot de passe
                           </p>
-                          <p className="font-medium text-gray-900 dark:text-white">
+                          <p className="text-sm font-medium text-slate-900 dark:text-white">
                             {showPassword
                               ? selectedClient.motDePasse
                               : '••••••••'}
@@ -427,16 +452,16 @@ export default function ClientModal({
                         </div>
                         <button
                           onClick={() => setShowPassword(!showPassword)}
-                          className="p-2 rounded-lg hover:bg-secondary transition-colors"
+                          className="p-1.5 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-700 transition-colors"
                         >
                           {showPassword ? (
                             <EyeSlash
-                              className="h-4 w-4 text-gray-500"
+                              className="h-3.5 w-3.5 text-slate-500"
                               weight="bold"
                             />
                           ) : (
                             <Eye
-                              className="h-4 w-4 text-gray-500"
+                              className="h-3.5 w-3.5 text-slate-500"
                               weight="bold"
                             />
                           )}
@@ -449,44 +474,44 @@ export default function ClientModal({
 
             {/* Documents - Affiché pour DP et Consuel */}
             {(section.startsWith('dp') || section.startsWith('consuel')) && (
-              <div className="bg-primary rounded-lg p-6 border border-primary shadow">
-                <h3 className="text-lg font-bold text-primary mb-6 flex items-center gap-2">
-                  <Folder className="h-5 w-5 text-teal-500" weight="bold" />
+              <div className="bg-white dark:bg-slate-800 rounded-lg p-4 border border-slate-200 dark:border-slate-700 shadow">
+                <h3 className="text-sm font-bold text-slate-900 dark:text-white mb-3 flex items-center gap-2">
+                  <Folder className="h-4 w-4 text-cyan-500" weight="bold" />
                   Documents
                 </h3>
                 {loadingFiles ? (
-                  <div className="text-center text-tertiary py-4">Chargement des fichiers...</div>
+                  <div className="text-center text-slate-500 dark:text-slate-400 py-3 text-sm">Chargement des fichiers...</div>
                 ) : clientFiles.length === 0 ? (
-                  <div className="text-center text-tertiary py-4">Aucun document disponible</div>
+                  <div className="text-center text-slate-500 dark:text-slate-400 py-3 text-sm">Aucun document disponible</div>
                 ) : (
-                  <div className="space-y-3">
+                  <div className="space-y-2">
                     {clientFiles.map((file) => (
                       <div
                         key={file.id}
-                        className="flex items-center gap-3 p-4 bg-secondary rounded-lg border border-primary hover:bg-tertiary transition-colors"
+                        className="flex items-center gap-2 p-3 bg-slate-50 dark:bg-slate-700 rounded-lg border border-slate-200 dark:border-slate-600 hover:bg-slate-100 dark:hover:bg-slate-600 transition-colors"
                       >
-                        <FileText className="h-5 w-5 text-teal-500" weight="bold" />
+                        <FileText className="h-4 w-4 text-cyan-500" weight="bold" />
                         <div className="flex-1 min-w-0">
-                          <p className="font-medium text-primary truncate">{file.name}</p>
-                          <p className="text-xs text-tertiary">
+                          <p className="text-sm font-medium text-slate-900 dark:text-white truncate">{file.name}</p>
+                          <p className="text-[10px] text-slate-500 dark:text-slate-400">
                             {(file.size / 1024).toFixed(2)} KB
                           </p>
                         </div>
-                        <div className="flex items-center gap-2">
+                        <div className="flex items-center gap-1">
                           <button
                             onClick={() => setPreviewFile({ name: file.name, url: file.url, type: file.type })}
-                            className="p-2 text-gray-500 hover:text-teal-500 transition-colors"
+                            className="p-1.5 text-gray-500 hover:text-cyan-500 transition-colors"
                             title="Prévisualiser"
                           >
-                            <Eye className="h-5 w-5" weight="bold" />
+                            <Eye className="h-4 w-4" weight="bold" />
                           </button>
                           <a
                             href={file.url}
                             download={file.name}
-                            className="p-2 text-gray-500 hover:text-teal-500 transition-colors"
+                            className="p-1.5 text-gray-500 hover:text-cyan-500 transition-colors"
                             title="Télécharger"
                           >
-                            <Link className="h-5 w-5" weight="bold" />
+                            <Link className="h-4 w-4" weight="bold" />
                           </a>
                         </div>
                       </div>
@@ -498,100 +523,100 @@ export default function ClientModal({
 
             {/* Informations Consuel - Affiché uniquement pour Consuel */}
             {section.startsWith('consuel') && (
-              <div className="bg-primary rounded-lg p-6 border border-primary shadow">
-                <h3 className="text-lg font-bold text-primary mb-6 flex items-center gap-2">
-                  <Lightning className="h-5 w-5 text-teal-500" weight="bold" />
+              <div className="bg-white dark:bg-slate-800 rounded-lg p-4 border border-slate-200 dark:border-slate-700 shadow">
+                <h3 className="text-sm font-bold text-slate-900 dark:text-white mb-3 flex items-center gap-2">
+                  <Lightning className="h-4 w-4 text-cyan-500" weight="bold" />
                   Informations Consuel
                 </h3>
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
                   {selectedClient.pvChantierDate && (
-                    <div className="flex items-center gap-3 p-4 bg-secondary rounded-lg border border-primary">
+                    <div className="flex items-center gap-2 p-3 bg-white dark:bg-slate-800 rounded-lg border border-slate-200 dark:border-slate-700">
                       <Calendar
-                        className="h-4 w-4 text-teal-500"
+                        className="h-3.5 w-3.5 text-cyan-500"
                         weight="bold"
                       />
                       <div>
-                        <p className="text-xs font-semibold text-tertiary">
+                        <p className="text-[10px] font-semibold text-slate-600 dark:text-slate-400">
                           PV Chantier
                         </p>
-                        <p className="font-medium text-primary">
+                        <p className="text-sm font-medium text-slate-900 dark:text-white">
                           {formatDateFR(selectedClient.pvChantierDate)}
                         </p>
                       </div>
                     </div>
                   )}
                   {selectedClient.causeNonPresence && (
-                    <div className="flex items-center gap-3 p-4 bg-secondary rounded-lg border border-primary">
+                    <div className="flex items-center gap-2 p-3 bg-white dark:bg-slate-800 rounded-lg border border-slate-200 dark:border-slate-700">
                       <WarningCircle
-                        className="h-4 w-4 text-red-500"
+                        className="h-3.5 w-3.5 text-red-500"
                         weight="bold"
                       />
                       <div>
-                        <p className="text-xs font-semibold text-tertiary">
+                        <p className="text-[10px] font-semibold text-slate-600 dark:text-slate-400">
                           Cause non présence
                         </p>
-                        <p className="font-medium text-primary">
+                        <p className="text-sm font-medium text-slate-900 dark:text-white">
                           {selectedClient.causeNonPresence}
                         </p>
                       </div>
                     </div>
                   )}
                   {selectedClient.etatActuel && (
-                    <div className="flex items-center gap-3 p-4 bg-secondary rounded-lg border border-primary">
+                    <div className="flex items-center gap-2 p-3 bg-white dark:bg-slate-800 rounded-lg border border-slate-200 dark:border-slate-700">
                       <CheckCircle
-                        className="h-4 w-4 text-emerald-500"
+                        className="h-3.5 w-3.5 text-emerald-500"
                         weight="bold"
                       />
                       <div>
-                        <p className="text-xs font-semibold text-tertiary">
+                        <p className="text-[10px] font-semibold text-slate-600 dark:text-slate-400">
                           État actuel
                         </p>
-                        <p className="font-medium text-primary">
+                        <p className="text-sm font-medium text-slate-900 dark:text-white">
                           {selectedClient.etatActuel}
                         </p>
                       </div>
                     </div>
                   )}
                   {selectedClient.typeConsuel && (
-                    <div className="flex items-center gap-3 p-4 bg-secondary rounded-lg border border-primary">
+                    <div className="flex items-center gap-2 p-3 bg-white dark:bg-slate-800 rounded-lg border border-slate-200 dark:border-slate-700">
                       <Lightning
-                        className="h-4 w-4 text-amber-500"
+                        className="h-3.5 w-3.5 text-cyan-500"
                         weight="bold"
                       />
                       <div>
-                        <p className="text-xs font-semibold text-tertiary">
+                        <p className="text-[10px] font-semibold text-slate-600 dark:text-slate-400">
                           Type Consuel
                         </p>
-                        <p className="font-medium text-primary">
+                        <p className="text-sm font-medium text-slate-900 dark:text-white">
                           {selectedClient.typeConsuel}
                         </p>
                       </div>
                     </div>
                   )}
                   {selectedClient.dateDerniereDemarche && (
-                    <div className="flex items-center gap-3 p-4 bg-secondary rounded-lg border border-primary">
+                    <div className="flex items-center gap-2 p-3 bg-white dark:bg-slate-800 rounded-lg border border-slate-200 dark:border-slate-700">
                       <Calendar
-                        className="h-4 w-4 text-teal-500"
+                        className="h-3.5 w-3.5 text-cyan-500"
                         weight="bold"
                       />
                       <div>
-                        <p className="text-xs font-semibold text-tertiary">
+                        <p className="text-[10px] font-semibold text-slate-600 dark:text-slate-400">
                           Dernière démarche
                         </p>
-                        <p className="font-medium text-primary">
+                        <p className="text-sm font-medium text-slate-900 dark:text-white">
                           {formatDateFR(selectedClient.dateDerniereDemarche)}
                         </p>
                       </div>
                     </div>
                   )}
                   {selectedClient.dateEstimative && (
-                    <div className="flex items-center gap-3 p-4 bg-secondary rounded-lg border border-primary">
-                      <Clock className="h-4 w-4 text-teal-500" weight="bold" />
+                    <div className="flex items-center gap-2 p-3 bg-white dark:bg-slate-800 rounded-lg border border-slate-200 dark:border-slate-700">
+                      <Clock className="h-3.5 w-3.5 text-cyan-500" weight="bold" />
                       <div>
-                        <p className="text-xs font-semibold text-tertiary">
-                          Date Estimatives
+                        <p className="text-[10px] font-semibold text-slate-600 dark:text-slate-400">
+                          {section === 'installation' ? 'Date de pose' : 'DatE Ed poess'}
                         </p>
-                        <p className="font-medium text-primary">
+                        <p className="text-sm font-medium text-slate-900 dark:text-white">
                           {formatDateFR(selectedClient.dateEstimative)}
                         </p>
                       </div>
@@ -606,16 +631,16 @@ export default function ClientModal({
               section === 'raccordement' ||
               section === 'raccordement-mes') &&
               selectedClient.commentaires && (
-                <div className="bg-primary rounded-lg p-6 border border-primary shadow">
-                  <h3 className="text-lg font-bold text-primary mb-6 flex items-center gap-2">
+                <div className="bg-white dark:bg-slate-800 rounded-lg p-4 border border-slate-200 dark:border-slate-700 shadow">
+                  <h3 className="text-sm font-bold text-slate-900 dark:text-white mb-3 flex items-center gap-2">
                     <ChatCircle
-                      className="h-5 w-5 text-teal-500"
+                      className="h-4 w-4 text-cyan-500"
                       weight="bold"
                     />
                     Commentaires
                   </h3>
-                  <div className="p-4 bg-secondary rounded-lg border border-primary">
-                    <p className="font-medium text-primary whitespace-pre-wrap">
+                  <div className="p-3 bg-slate-50 dark:bg-slate-700 rounded-lg border border-slate-200 dark:border-slate-600">
+                    <p className="text-sm font-medium text-slate-900 dark:text-white whitespace-pre-wrap">
                       {selectedClient.commentaires}
                     </p>
                   </div>
@@ -624,65 +649,65 @@ export default function ClientModal({
 
             {/* Informations Raccordement - Affiché uniquement pour Raccordement */}
             {section === 'raccordement' && (
-              <div className="bg-primary rounded-lg p-6 border border-primary shadow">
-                <h3 className="text-lg font-bold text-primary mb-6 flex items-center gap-2">
-                  <Flag className="h-5 w-5 text-teal-500" weight="bold" />
+              <div className="bg-white dark:bg-slate-800 rounded-lg p-4 border border-slate-200 dark:border-slate-700 shadow">
+                <h3 className="text-sm font-bold text-slate-900 dark:text-white mb-3 flex items-center gap-2">
+                  <Flag className="h-4 w-4 text-cyan-500" weight="bold" />
                   Raccordement
                 </h3>
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
                   {selectedClient.typeConsuel && (
-                    <div className="flex items-center gap-3 p-4 bg-secondary rounded-lg border border-primary">
+                    <div className="flex items-center gap-2 p-3 bg-white dark:bg-slate-800 rounded-lg border border-slate-200 dark:border-slate-700">
                       <Lightning
-                        className="h-4 w-4 text-amber-500"
+                        className="h-3.5 w-3.5 text-cyan-500"
                         weight="bold"
                       />
                       <div>
-                        <p className="text-xs font-semibold text-tertiary">
+                        <p className="text-[10px] font-semibold text-slate-600 dark:text-slate-400">
                           Type de consuel
                         </p>
-                        <p className="font-medium text-primary">
+                        <p className="text-sm font-medium text-slate-900 dark:text-white">
                           {selectedClient.typeConsuel}
                         </p>
                       </div>
                     </div>
                   )}
                   {selectedClient.raccordement && (
-                    <div className="flex items-center gap-3 p-4 bg-secondary rounded-lg border border-primary">
-                      <Flag className="h-4 w-4 text-teal-500" />
+                    <div className="flex items-center gap-2 p-3 bg-white dark:bg-slate-800 rounded-lg border border-slate-200 dark:border-slate-700">
+                      <Flag className="h-3.5 w-3.5 text-cyan-500" />
                       <div>
-                        <p className="text-xs font-semibold text-tertiary">
+                        <p className="text-[10px] font-semibold text-slate-600 dark:text-slate-400">
                           Raccordement
                         </p>
-                        <p className="font-medium text-primary">
+                        <p className="text-sm font-medium text-slate-900 dark:text-white">
                           {selectedClient.raccordement}
                         </p>
                       </div>
                     </div>
                   )}
                   {selectedClient.dateDerniereDemarche && (
-                    <div className="flex items-center gap-3 p-4 bg-secondary rounded-lg border border-primary">
+                    <div className="flex items-center gap-2 p-3 bg-white dark:bg-slate-800 rounded-lg border border-slate-200 dark:border-slate-700">
                       <Calendar
-                        className="h-4 w-4 text-teal-500"
+                        className="h-3.5 w-3.5 text-cyan-500"
                         weight="bold"
                       />
                       <div>
-                        <p className="text-xs font-semibold text-tertiary">
+                        <p className="text-[10px] font-semibold text-slate-600 dark:text-slate-400">
                           Date dernière démarche
                         </p>
-                        <p className="font-medium text-primary">
+                        <p className="text-sm font-medium text-slate-900 dark:text-white">
                           {formatDateFR(selectedClient.dateDerniereDemarche)}
                         </p>
                       </div>
                     </div>
                   )}
                   {selectedClient.dateEstimative && (
-                    <div className="flex items-center gap-3 p-4 bg-secondary rounded-lg border border-primary">
-                      <Clock className="h-4 w-4 text-teal-500" weight="bold" />
+                    <div className="flex items-center gap-2 p-3 bg-white dark:bg-slate-800 rounded-lg border border-slate-200 dark:border-slate-700">
+                      <Clock className="h-3.5 w-3.5 text-cyan-500" weight="bold" />
                       <div>
-                        <p className="text-xs font-semibold text-tertiary">
-                          Date Estimatives
+                        <p className="text-[10px] font-semibold text-slate-600 dark:text-slate-400">
+                          {section === 'installation' ? 'Date de pose' : 'DatE Ed poess'}
                         </p>
-                        <p className="font-medium text-primary">
+                        <p className="text-sm font-medium text-slate-900 dark:text-white">
                           {formatDateFR(selectedClient.dateEstimative)}
                         </p>
                       </div>
@@ -694,39 +719,39 @@ export default function ClientModal({
 
             {/* Informations Raccordement MES - Affiché uniquement pour Raccordement MES */}
             {section === 'raccordement-mes' && (
-              <div className="bg-primary rounded-lg p-6 border border-primary shadow">
-                <h3 className="text-lg font-bold text-primary mb-6 flex items-center gap-2">
-                  <House className="h-5 w-5 text-teal-500" weight="bold" />
+              <div className="bg-white dark:bg-slate-800 rounded-lg p-4 border border-slate-200 dark:border-slate-700 shadow">
+                <h3 className="text-sm font-bold text-slate-900 dark:text-white mb-3 flex items-center gap-2">
+                  <House className="h-4 w-4 text-cyan-500" weight="bold" />
                   Mise en service
                 </h3>
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
                   {selectedClient.numeroContrat && (
-                    <div className="flex items-center gap-3 p-4 bg-secondary rounded-lg border border-primary">
+                    <div className="flex items-center gap-2 p-3 bg-white dark:bg-slate-800 rounded-lg border border-slate-200 dark:border-slate-700">
                       <FileText
-                        className="h-4 w-4 text-teal-500"
+                        className="h-3.5 w-3.5 text-cyan-500"
                         weight="bold"
                       />
                       <div>
-                        <p className="text-xs font-semibold text-tertiary">
+                        <p className="text-[10px] font-semibold text-slate-600 dark:text-slate-400">
                           Numéro de contrat
                         </p>
-                        <p className="font-medium text-primary">
+                        <p className="text-sm font-medium text-slate-900 dark:text-white">
                           {selectedClient.numeroContrat}
                         </p>
                       </div>
                     </div>
                   )}
                   {selectedClient.dateMiseEnService && (
-                    <div className="flex items-center gap-3 p-4 bg-secondary rounded-lg border border-primary">
+                    <div className="flex items-center gap-2 p-3 bg-white dark:bg-slate-800 rounded-lg border border-slate-200 dark:border-slate-700">
                       <Calendar
-                        className="h-4 w-4 text-teal-500"
+                        className="h-3.5 w-3.5 text-cyan-500"
                         weight="bold"
                       />
                       <div>
-                        <p className="text-xs font-semibold text-tertiary">
+                        <p className="text-[10px] font-semibold text-slate-600 dark:text-slate-400">
                           Date de Mise en service
                         </p>
-                        <p className="font-medium text-primary">
+                        <p className="text-sm font-medium text-slate-900 dark:text-white">
                           {formatDateFR(selectedClient.dateMiseEnService)}
                         </p>
                       </div>

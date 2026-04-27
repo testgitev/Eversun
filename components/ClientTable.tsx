@@ -13,22 +13,15 @@ import {
   Buildings,
   FileText,
   User,
-  MapPin,
-  Shield,
-  Globe,
   Key,
-  Check,
   WarningCircle,
   Lightning,
   CheckCircle,
   ChatCircle,
-  Pen,
-  Flag,
   Clock,
-  House,
-  Funnel,
   CaretDown,
   List,
+  Globe,
 } from '@phosphor-icons/react';
 import { ClientRecord } from '@/types/client';
 import {
@@ -360,7 +353,7 @@ function ClientTable({
                     value={filterStatus}
                     onChange={(e) => debouncedSetFilterStatus(e.target.value)}
                     aria-label="Filtrer par statut"
-                    className="w-full px-3 py-2 rounded-lg border border-primary bg-primary text-sm text-primary focus:outline-none focus:ring-2 focus:ring-amber-500"
+                    className="w-full px-3 py-2 rounded-lg border border-primary bg-primary text-sm text-primary focus:outline-none focus:ring-2 focus:ring-cyan-500"
                   />
                 </div>
                 <div>
@@ -373,7 +366,7 @@ function ClientTable({
                     value={filterVille}
                     onChange={(e) => debouncedSetFilterVille(e.target.value)}
                     aria-label="Filtrer par ville"
-                    className="w-full px-3 py-2 rounded-lg border border-primary bg-primary text-sm text-primary focus:outline-none focus:ring-2 focus:ring-amber-500"
+                    className="w-full px-3 py-2 rounded-lg border border-primary bg-primary text-sm text-primary focus:outline-none focus:ring-2 focus:ring-cyan-500"
                   />
                 </div>
                 <div>
@@ -386,7 +379,7 @@ function ClientTable({
                     value={filterPrestataire}
                     onChange={(e) => debouncedSetFilterPrestataire(e.target.value)}
                     aria-label="Filtrer par prestataire"
-                    className="w-full px-3 py-2 rounded-lg border border-primary bg-primary text-sm text-primary focus:outline-none focus:ring-2 focus:ring-amber-500"
+                    className="w-full px-3 py-2 rounded-lg border border-primary bg-primary text-sm text-primary focus:outline-none focus:ring-2 focus:ring-cyan-500"
                   />
                 </div>
                 <div>
@@ -399,7 +392,7 @@ function ClientTable({
                     value={filterFinancement}
                     onChange={(e) => debouncedSetFilterFinancement(e.target.value)}
                     aria-label="Filtrer par financement"
-                    className="w-full px-3 py-2 rounded-lg border border-primary bg-primary text-sm text-primary focus:outline-none focus:ring-2 focus:ring-amber-500"
+                    className="w-full px-3 py-2 rounded-lg border border-primary bg-primary text-sm text-primary focus:outline-none focus:ring-2 focus:ring-cyan-500"
                   />
                 </div>
                 <div>
@@ -441,7 +434,7 @@ function ClientTable({
                 </button>
                 <button
                   onClick={() => setShowFilters(false)}
-                  className="px-4 py-2 rounded-lg bg-gradient-to-r from-amber-500 to-orange-500 text-white font-semibold shadow-md hover:shadow transition-all duration-200"
+                  className="px-4 py-2 rounded-lg bg-gradient-to-r from-cyan-500 to-blue-500 text-white font-semibold shadow-md hover:shadow transition-all duration-200"
                 >
                   Appliquer
                 </button>
@@ -458,7 +451,7 @@ function ClientTable({
 
           <div className="flex items-center justify-between gap-3 bg-gradient-to-br from-white to-gray-50 dark:from-gray-800 dark:to-gray-900 rounded-xl p-4 border border-gray-200 dark:border-gray-700 shadow-sm hover:shadow-md transition-all duration-200">
             <div className="flex items-center gap-2">
-              <div className="p-2 rounded-lg bg-gradient-to-br from-blue-500 to-indigo-600 text-white shadow-md">
+              <div className="p-2 rounded-lg bg-gradient-to-br from-cyan-500 to-blue-500 text-white shadow-md">
                 <List className="h-4 w-4" weight="bold" />
               </div>
               <label className="text-gray-900 dark:text-white font-semibold text-sm">
@@ -468,7 +461,7 @@ function ClientTable({
             <select
               value={rowsPerPage}
               onChange={(e) => setRowsPerPage(Number(e.target.value))}
-              className="px-4 py-2 rounded-lg border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all shadow-sm hover:shadow-md font-medium"
+              className="px-4 py-2 rounded-lg border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-cyan-500 transition-all shadow-sm hover:shadow-md font-medium"
             >
               {[5, 10, 20, 50].map((n) => (
                 <option key={n} value={n}>
@@ -496,7 +489,7 @@ function ClientTable({
                 Tableau des dossiers clients, {filteredItems.length} resultats
               </caption>
               <thead>
-                <tr className="bg-gradient-to-r from-gray-50 to-gray-100 dark:from-gray-700 dark:to-gray-800 border-b-2 border-gray-200 dark:border-gray-600">
+                <tr className="bg-white/80 dark:bg-slate-800/80 backdrop-blur-lg border-b-2 border-cyan-500/20">
                   {columns.map((col, idx) => (
                     <th
                       key={col.key as string}
@@ -507,25 +500,25 @@ function ClientTable({
                             : 'descending'
                           : 'none'
                       }
-                      className={`px-3 py-2 font-bold text-left cursor-pointer select-none hover:bg-gray-100 dark:hover:bg-gray-600 transition-all duration-200 whitespace-nowrap text-[10px] uppercase tracking-wider text-gray-700 dark:text-gray-200 group ${
+                      className={`px-4 py-3 font-bold text-left cursor-pointer select-none hover:bg-cyan-50 dark:hover:bg-cyan-900/20 transition-all duration-300 whitespace-nowrap text-[10px] uppercase tracking-wider text-slate-700 dark:text-slate-300 group ${
                         idx === 0
-                          ? 'sticky left-0 bg-gradient-to-r from-gray-50 to-gray-100 dark:from-gray-700 dark:to-gray-800 shadow-r'
+                          ? 'sticky left-0 bg-white/80 dark:bg-slate-800/80 backdrop-blur-lg'
                           : ''
                       }`}
                       onClick={() => setSortKey(col.key as string)}
                     >
                       <div className="flex items-center gap-1.5">
-                        <span className="group-hover:text-amber-600 dark:group-hover:text-amber-400 transition-colors">
+                        <span className="group-hover:text-cyan-600 dark:group-hover:text-cyan-400 transition-colors">
                           {col.label}
                         </span>
                         {sortKey === col.key && (
-                          <span className="text-amber-600 dark:text-amber-400 font-bold">
+                          <span className="text-cyan-600 dark:text-cyan-400 font-bold">
                             {sortDir === 'asc' ? '↑' : '↓'}
                           </span>
                         )}
                         {sortKey !== col.key && (
                           <CaretDown
-                            className="w-2.5 h-2.5 text-gray-400 opacity-0 group-hover:opacity-100 transition-opacity"
+                            className="w-2.5 h-2.5 text-slate-400 opacity-0 group-hover:opacity-100 transition-opacity group-hover:text-cyan-500"
                             weight="bold"
                           />
                         )}
@@ -548,10 +541,10 @@ function ClientTable({
                 {paginated.map((item, index) => (
                   <tr
                     key={item._id || item.id || index}
-                    className={`border-b border-gray-100 dark:border-gray-700 hover:bg-gradient-to-r hover:from-blue-50 hover:to-indigo-50 dark:hover:from-blue-900/10 dark:hover:to-indigo-900/10 transition-all duration-200 group cursor-pointer ${
+                    className={`border-b border-slate-100 dark:border-slate-800 hover:bg-gradient-to-r hover:from-cyan-50/50 hover:to-violet-50/50 dark:hover:from-cyan-900/10 dark:hover:to-violet-900/10 transition-all duration-300 group cursor-pointer ${
                       index % 2 === 0
-                        ? 'bg-white dark:bg-gray-800'
-                        : 'bg-gray-50 dark:bg-gray-800/50'
+                        ? 'bg-white dark:bg-slate-800'
+                        : 'bg-slate-50/50 dark:bg-slate-800/50'
                     }`}
                     onClick={() => handleRowClick(item)}
                   >
@@ -570,7 +563,7 @@ function ClientTable({
                               e.stopPropagation();
                               handleClientClick(item);
                             }}
-                            className="text-left w-full font-semibold text-primary hover:text-amber-600 dark:hover:text-amber-400 underline-offset-2 hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-amber-500 rounded"
+                            className="text-left w-full font-semibold text-primary hover:text-cyan-600 dark:hover:text-cyan-400 underline-offset-2 hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-cyan-500 rounded"
                             aria-label={`Voir le détail du dossier ${item.client || 'client'}`}
                           >
                             {(item[col.key] as string) || '-'}
@@ -581,23 +574,17 @@ function ClientTable({
                           col.key === 'dateMiseEnService' ||
                           col.key === 'datePV' ||
                           col.key === 'pvChantierDate' ? (
-                          <span className="inline-flex items-center gap-1 text-gray-700 dark:text-gray-300 font-medium">
+                          <span className="inline-flex items-center gap-1 text-slate-700 dark:text-slate-300 font-medium">
                             <Calendar
-                              className="w-3 h-3 text-amber-500"
+                              className="w-3 h-3 text-cyan-500"
                               weight="fill"
                             />
                             {formatDateFR(item[col.key] as string)}
                           </span>
-                        ) : col.key === 'pvChantier' &&
-                          isInstallation &&
-                          item.pvChantier ? (
-                          <span className="font-bold text-amber-600 dark:text-amber-400 bg-amber-50 dark:bg-amber-900/20 px-2 py-0.5 rounded-md text-xs">
-                            {item.pvChantier}
-                          </span>
                         ) : col.key === 'pvChantier' && item.pvChantier ? (
                           <span className="inline-flex items-center gap-1 text-gray-700 dark:text-gray-300 font-medium">
                             <Calendar
-                              className="w-3 h-3 text-amber-500"
+                              className="w-3 h-3 text-cyan-500"
                               weight="fill"
                             />
                             {formatDateFR(item[col.key] as string)}
@@ -610,7 +597,7 @@ function ClientTable({
                             href={item.portail}
                             target="_blank"
                             rel="noopener noreferrer"
-                            className="inline-flex items-center gap-2 px-3 py-1.5 rounded-lg bg-gradient-to-r from-green-500 to-emerald-500 text-white font-semibold hover:from-green-600 hover:to-emerald-600 transition-all duration-200 text-xs shadow-md hover:shadow-lg transform hover:scale-105"
+                            className="inline-flex items-center gap-2 px-3 py-1.5 rounded-lg bg-gradient-to-r from-cyan-500 to-blue-500 text-white font-semibold hover:from-cyan-600 hover:to-blue-600 transition-all duration-300 text-xs shadow-md shadow-cyan-500/30 hover:shadow-lg hover:shadow-cyan-500/40 transform hover:scale-105"
                             onClick={(e) => e.stopPropagation()}
                           >
                             <Globe className="w-3 h-3" weight="bold" />
@@ -618,12 +605,12 @@ function ClientTable({
                             <ArrowSquareOut className="w-3 h-3" weight="bold" />
                           </a>
                         ) : col.key === 'identifiant' && item.identifiant ? (
-                          <span className="inline-flex items-center gap-1 px-2 py-1 rounded-lg bg-blue-50 dark:bg-blue-900/20 text-blue-700 dark:text-blue-300 font-semibold text-xs border border-blue-200 dark:border-blue-800 shadow-sm">
+                          <span className="inline-flex items-center gap-1 px-2 py-1 rounded-lg bg-gradient-to-r from-cyan-50 to-blue-50 dark:from-cyan-900/20 dark:to-blue-900/20 text-cyan-700 dark:text-cyan-300 font-semibold text-xs border border-cyan-200 dark:border-cyan-800 shadow-sm shadow-cyan-500/20">
                             <Key className="w-3 h-3" weight="bold" />
                             {item.identifiant}
                           </span>
                         ) : col.key === 'motDePasse' && item.motDePasse ? (
-                          <span className="inline-flex items-center gap-1 px-2 py-1 rounded-lg bg-red-50 dark:bg-red-900/20 text-red-700 dark:text-red-300 font-semibold text-xs border border-red-200 dark:border-red-800 shadow-sm">
+                          <span className="inline-flex items-center gap-1 px-2 py-1 rounded-lg bg-gradient-to-r from-violet-50 to-purple-50 dark:from-violet-900/20 dark:to-purple-900/20 text-violet-700 dark:text-violet-300 font-semibold text-xs border border-violet-200 dark:border-violet-800 shadow-sm shadow-violet-500/20">
                             <Key className="w-3 h-3" weight="bold" />
                             {item.motDePasse}
                           </span>
@@ -672,9 +659,9 @@ function ClientTable({
                             {item.causeNonPresence}
                           </span>
                         ) : col.key === 'commentaires' && item.commentaires ? (
-                          <div className="flex items-center gap-1 text-gray-600 dark:text-gray-400">
+                          <div className="flex items-center gap-1 text-slate-600 dark:text-slate-400">
                             <ChatCircle
-                              className="w-3 h-3 text-amber-500"
+                              className="w-3 h-3 text-cyan-500"
                               weight="fill"
                             />
                             <span

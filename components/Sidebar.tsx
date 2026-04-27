@@ -191,12 +191,12 @@ function Sidebar({
       </AnimatePresence>
 
       <aside
-        className={`bg-primary border-r border-primary h-[calc(100vh-3.5rem)] z-40 flex flex-col shadow-md transition-all duration-200 flex-shrink-0 ${
+        className={`bg-white/95 dark:bg-slate-900/95 backdrop-blur-md border-r border-slate-200 dark:border-slate-700 h-[calc(100vh-4rem)] z-40 flex flex-col shadow-lg shadow-slate-200/30 dark:shadow-black/30 transition-all duration-200 ease-out flex-shrink-0 ${
           isMobile
             ? isMobileOpen
-              ? 'translate-x-0 w-56 fixed left-0'
-              : '-translate-x-full w-56 fixed left-0'
-            : 'fixed left-0 top-14 ' + (isCollapsed ? 'w-14' : 'w-48')
+              ? 'translate-x-0 w-52 fixed left-0 top-16'
+              : '-translate-x-full w-52 fixed left-0 top-16'
+            : 'fixed left-0 top-16 ' + (isCollapsed ? 'w-14' : 'w-56')
         }`}
         role="navigation"
         aria-label="Navigation principale"
@@ -214,7 +214,7 @@ function Sidebar({
 
         {/* Search Bar */}
         {!isCollapsed && (
-          <div className="px-3 py-2">
+          <div className="px-2.5 py-2">
             <div className="relative">
               <MagnifyingGlass className="absolute left-2.5 top-1/2 transform -translate-y-1/2 h-3.5 w-3.5 text-gray-400 dark:text-gray-500" />
               <Input
@@ -222,7 +222,7 @@ function Sidebar({
                 placeholder="Rechercher..."
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
-                className="h-8 py-1.5 pl-8 pr-8 text-xs shadow-none hover:shadow-none"
+                className="h-7 py-1 pl-7 pr-7 text-xs shadow-none hover:shadow-none"
                 aria-label="Rechercher une section"
               />
               {searchQuery && (
@@ -250,7 +250,7 @@ function Sidebar({
                   <button
                     type="button"
                     onClick={() => toggleGroup(group.title)}
-                    className="w-full flex items-center justify-between px-3 py-2 text-[10px] font-semibold uppercase tracking-wider text-gray-500 dark:text-gray-400 rounded-md hover:bg-secondary/50 transition-colors"
+                    className="w-full flex items-center justify-between px-2.5 py-1.5 text-[10px] font-semibold uppercase tracking-wider text-gray-500 dark:text-gray-400 rounded-md hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors"
                   >
                     <span>{group.title}</span>
                     <CaretDown
@@ -260,7 +260,7 @@ function Sidebar({
                   </button>
                 )}
                 {isGroupOpen && (
-                  <ul className="space-y-1.5 px-2 mt-2" role="list">
+                  <ul className="space-y-1 px-1.5 mt-1.5" role="list">
                     {group.sections.map((section, sectionIndex) => {
                       const globalIndex =
                         sectionGroups
@@ -272,16 +272,16 @@ function Sidebar({
                         <li key={section.id} role="listitem">
                           <button
                             onClick={() => setActiveSection(section.id)}
-                            className={`w-full text-left rounded-md text-xs font-semibold transition-all duration-200 flex items-center group relative overflow-hidden
+                            className={`w-full text-left rounded-lg text-xs font-medium transition-all duration-200 ease-out flex items-center group relative overflow-hidden
                             ${
                               isCollapsed
-                                ? 'justify-center px-2 py-2'
-                                : 'px-3 py-2 gap-2'
+                                ? 'justify-center px-1.5 py-2.5'
+                                : 'px-3 py-2.5 gap-2.5'
                             }
                             ${
                               activeSection === section.id
-                                ? 'bg-primary-500 text-white shadow-sm ring-2 ring-primary-500 ring-offset-2 ring-offset-gray-100 dark:ring-offset-gray-900'
-                                : 'text-secondary hover:bg-secondary focus:outline-none focus:ring-2 focus:ring-primary-500 focus:ring-offset-2 focus:ring-offset-white dark:focus:ring-offset-gray-900'
+                                ? 'bg-gradient-to-r from-cyan-500 to-blue-500 text-white shadow-md shadow-cyan-500/25'
+                                : 'text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800 focus:outline-none focus:ring-2 focus:ring-cyan-500 focus:ring-offset-1 focus:ring-offset-white dark:focus:ring-offset-gray-900'
                             }`}
                             tabIndex={0}
                             aria-current={
@@ -293,16 +293,13 @@ function Sidebar({
                                 : undefined
                             }
                           >
-                            {activeSection === section.id && (
-                              <div className="absolute inset-0 bg-gradient-to-r from-white/20 via-transparent to-white/20 translate-x-[-100%] group-hover:translate-x-[100%] transition-transform duration-700" />
-                            )}
                             {section.icon && (
                               <section.icon
                                 weight="regular"
-                                className={`h-4 w-4 flex-shrink-0 transition-all duration-200 ${
+                                className={`h-4.5 w-4.5 flex-shrink-0 transition-all duration-200 ${
                                   activeSection === section.id
-                                    ? 'text-white scale-110'
-                                    : 'text-gray-400 dark:text-gray-500 group-hover:text-primary-500 dark:group-hover:text-primary-400 group-hover:scale-110'
+                                    ? 'text-white'
+                                    : 'text-slate-400 dark:text-slate-500 group-hover:text-cyan-500 dark:group-hover:text-cyan-400'
                                 }`}
                                 aria-hidden="true"
                               />
@@ -315,10 +312,10 @@ function Sidebar({
                                 {sectionCounts &&
                                   sectionCounts[section.id] !== undefined && (
                                     <span
-                                      className={`text-[10px] font-bold px-1.5 py-0.5 rounded-full transition-all duration-200 relative z-10 ${
+                                      className={`text-[10px] font-semibold px-1.5 py-0.5 rounded-full transition-all duration-200 relative z-10 ${
                                         activeSection === section.id
-                                          ? 'bg-white dark:bg-gray-800 text-primary-600 shadow'
-                                          : 'bg-primary-100 dark:bg-primary-900/30 text-primary-600 dark:text-primary-400 group-hover:bg-primary-200 dark:group-hover:bg-primary-800/50'
+                                          ? 'bg-white/20 text-white'
+                                          : 'bg-cyan-100 dark:bg-cyan-900/30 text-cyan-600 dark:text-cyan-400 group-hover:bg-cyan-200 dark:group-hover:bg-cyan-800/50'
                                       }`}
                                     >
                                       {sectionCounts[section.id]}
@@ -342,7 +339,7 @@ function Sidebar({
           <div className="px-2 py-2 border-t border-primary">
             <button
               onClick={handleCollapse}
-              className="w-full flex items-center justify-center gap-2 p-1.5 bg-secondary rounded-md hover:bg-amber-50 dark:hover:bg-amber-900/20 transition-all duration-200"
+              className="w-full flex items-center justify-center gap-2 p-1 bg-slate-100 dark:bg-slate-800 rounded-md hover:bg-slate-200 dark:hover:bg-slate-700 transition-all duration-150"
               aria-label={
                 isCollapsed ? 'Étendre la sidebar' : 'Réduire la sidebar'
               }
