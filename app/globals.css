@@ -1253,6 +1253,7 @@ body {
   margin: 0.25rem;
   border-radius: var(--radius-md);
   transition: all var(--transition-fast);
+  cursor: pointer;
 }
 
 .react-datepicker__day:hover {
@@ -1413,6 +1414,7 @@ select option {
   cursor: pointer;
   transition: background-color var(--transition-fast);
   color: var(--text-primary);
+  border-radius: var(--radius-sm);
 }
 
 .custom-select-option:hover {
