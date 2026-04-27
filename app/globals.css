@@ -79,10 +79,10 @@
   --border-accent: #333333;
   --border-danger: #1a1a1a;
 
-  /* Text Colors - Professional */
-  --text-primary: #000000;
-  --text-secondary: #4d4d4d;
-  --text-tertiary: #666666;
+  /* Text Colors - Professional & Subtle */
+  --text-primary: #1a1a1a;
+  --text-secondary: #4a4a4a;
+  --text-tertiary: #6a6a6a;
   --text-inverse: #ffffff;
 
   /* Shadow Colors - Subtle Professional */
@@ -164,11 +164,11 @@
   --border-accent: #10b981;
   --border-danger: #ef4444;
 
-  /* Dark Mode Text */
-  --text-primary: #f8fafc;
-  --text-secondary: #cbd5e1;
-  --text-tertiary: #94a3b8;
-  --text-inverse: #0f172a;
+  /* Dark Mode Text - Subtle */
+  --text-primary: #e5e5e5;
+  --text-secondary: #c5c5c5;
+  --text-tertiary: #a5a5a5;
+  --text-inverse: #1a1a1a;
 
   /* Dark Mode Shadows */
   --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
