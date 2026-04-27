@@ -29,6 +29,7 @@
     "eslint-plugin-prettier": "^5.5.5",
     "express-rate-limit": "^8.4.1",
     "framer-motion": "^12.38.0",
+    "googleapis": "^171.4.0",
     "jsonwebtoken": "^9.0.3",
     "mongodb": "^7.1.1",
     "mongoose": "^8.0.0",

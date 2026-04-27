@@ -21,6 +21,7 @@ import {
   Link,
   Trash,
   PencilSimple,
+  Folder,
 } from '@phosphor-icons/react';
 import Badge from '@/components/ui/Badge';
 import ConfirmDialog from '@/components/ui/ConfirmDialog';
@@ -48,11 +49,39 @@ export default function ClientModal({
   setShowPassword,
 }: ClientModalProps) {
   const [showDeleteDialog, setShowDeleteDialog] = useState(false);
+  const [clientFiles, setClientFiles] = useState<Array<{ id: string; name: string; url: string; size: number }>>([]);
+  const [loadingFiles, setLoadingFiles] = useState(false);
   const modalRef = useRef<HTMLDivElement>(null);
   const previousActiveElementRef = useRef<HTMLElement | null>(null);
 
   useEffect(() => {
     if (!selectedClient) return;
+
+    // Load client files from Google Drive
+    const loadClientFiles = async () => {
+      if (!selectedClient.client) return;
+      
+      const isDp = section.startsWith('dp');
+      const isConsuel = section.startsWith('consuel');
+      
+      if (!isDp && !isConsuel) return;
+
+      setLoadingFiles(true);
+      try {
+        const response = await fetch(`/api/files?clientName=${encodeURIComponent(selectedClient.client)}`);
+        const data = await response.json();
+        if (data.success) {
+          setClientFiles(data.files || []);
+        }
+      } catch (error) {
+        console.error('Erreur lors du chargement des fichiers:', error);
+      } finally {
+        setLoadingFiles(false);
+      }
+    };
+
+    loadClientFiles();
+
     const handleEscape = (e: KeyboardEvent) => {
       if (e.key === 'Escape') onClose();
     };
@@ -416,6 +445,42 @@ export default function ClientModal({
                   </div>
                 </div>
               )}
+
+            {/* Documents - Affiché pour DP et Consuel */}
+            {(section.startsWith('dp') || section.startsWith('consuel')) && (
+              <div className="bg-primary rounded-lg p-6 border border-primary shadow">
+                <h3 className="text-lg font-bold text-primary mb-6 flex items-center gap-2">
+                  <Folder className="h-5 w-5 text-teal-500" weight="bold" />
+                  Documents
+                </h3>
+                {loadingFiles ? (
+                  <div className="text-center text-tertiary py-4">Chargement des fichiers...</div>
+                ) : clientFiles.length === 0 ? (
+                  <div className="text-center text-tertiary py-4">Aucun document disponible</div>
+                ) : (
+                  <div className="space-y-3">
+                    {clientFiles.map((file) => (
+                      <a
+                        key={file.id}
+                        href={file.url}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="flex items-center gap-3 p-4 bg-secondary rounded-lg border border-primary hover:bg-tertiary transition-colors"
+                      >
+                        <FileText className="h-5 w-5 text-teal-500" weight="bold" />
+                        <div className="flex-1 min-w-0">
+                          <p className="font-medium text-primary truncate">{file.name}</p>
+                          <p className="text-xs text-tertiary">
+                            {(file.size / 1024).toFixed(2)} KB
+                          </p>
+                        </div>
+                        <Link className="h-5 w-5 text-gray-500 hover:text-teal-500" weight="bold" />
+                      </a>
+                    ))}
+                  </div>
+                )}
+              </div>
+            )}
 
             {/* Informations Consuel - Affiché uniquement pour Consuel */}
             {section.startsWith('consuel') && (

@@ -8,6 +8,7 @@ import DatePicker from '@/components/ui/DatePicker';
 import Select from '@/components/ui/Select';
 import AutocompleteInput from '@/components/ui/AutocompleteInput';
 import Badge from '@/components/ui/Badge';
+import FileUpload, { UploadedFile } from '@/components/ui/FileUpload';
 import { cn } from '@/lib/utils';
 import {
   installationStatuts,
@@ -107,6 +108,7 @@ export default function ClientForm({
   const [dpAccordesData, setDpAccordesData] = useState<
     Record<string, { noDp: string; ville: string }>
   >({});
+  const [uploadedFiles, setUploadedFiles] = useState<UploadedFile[]>([]);
   const modalRef = useRef<HTMLDivElement>(null);
   const previousActiveElementRef = useRef<HTMLElement | null>(null);
 
@@ -681,6 +683,23 @@ export default function ClientForm({
                 </div>
               </div>
             )}
+
+            {isDp && form.client && (
+              <div className="bg-blue-50 dark:bg-gray-800 rounded-lg p-3 border border-blue-200 dark:border-gray-700 shadow-sm">
+                <h3 className="text-xs font-semibold text-gray-900 dark:text-white mb-3 flex items-center gap-1.5">
+                  <div className="p-1 rounded bg-blue-500 text-white">
+                    <FileText className="h-3 w-3" weight="bold" />
+                  </div>
+                  Documents
+                </h3>
+                <FileUpload
+                  clientName={form.client}
+                  section={section}
+                  onUploadComplete={(files) => setUploadedFiles((prev) => [...prev, ...files])}
+                />
+              </div>
+            )}
+
             {isInstallation && (
               <div
                 id="form-installation"
@@ -819,6 +838,22 @@ export default function ClientForm({
                     readOnly
                   />
                 </div>
+              </div>
+            )}
+
+            {isConsuel && form.client && (
+              <div className="bg-blue-50 dark:bg-gray-800 rounded-lg p-3 border border-blue-200 dark:border-gray-700 shadow-sm">
+                <h3 className="text-xs font-semibold text-gray-900 dark:text-white mb-3 flex items-center gap-1.5">
+                  <div className="p-1 rounded bg-blue-500 text-white">
+                    <FileText className="h-3 w-3" weight="bold" />
+                  </div>
+                  Documents
+                </h3>
+                <FileUpload
+                  clientName={form.client}
+                  section={section}
+                  onUploadComplete={(files) => setUploadedFiles((prev) => [...prev, ...files])}
+                />
               </div>
             )}
 
