@@ -207,6 +207,7 @@ function ClientTable({
       { key: 'client', label: 'Client' },
       { key: 'prestataire', label: 'Prestataire' },
       { key: 'typeConsuel', label: 'Type de consuel demandé' },
+      { key: 'statut', label: 'Statut' },
       { key: 'dateDerniereDemarche', label: 'Date dernière démarche' },
       { key: 'numeroContrat', label: 'Numéro de contrat' },
       {

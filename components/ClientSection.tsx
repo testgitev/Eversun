@@ -137,6 +137,7 @@ export default function ClientSection({ section }: ClientSectionProps) {
         ...record,
         section: 'raccordement' as Section,
         statut: 'Raccordement à faire',
+        raccordement: record.raccordement || 'Demande transmise',
       };
       // Retirer _id pour créer une nouvelle entrée, mais garder le clientId
       const { _id, id, ...toSend } = raccordementRecord;
@@ -153,6 +154,32 @@ export default function ClientSection({ section }: ClientSectionProps) {
       }
     } catch (error) {
       console.error('Erreur création Raccordement:', error);
+    }
+  };
+
+  // Créer une copie du client dans la section Raccordement MES (même clientId)
+  const createRaccordementMesCopy = async (record: ClientRecord) => {
+    try {
+      const mesRecord = {
+        ...record,
+        section: 'raccordement-mes' as Section,
+        statut: record.statut || record.raccordement || 'Mise en service',
+        dateMiseEnService: record.dateMiseEnService || new Date().toISOString(),
+      };
+      const { _id, id, ...toSend } = mesRecord;
+
+      const res = await fetch('/api/clients', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(toSend),
+      });
+
+      if (res.ok) {
+        toast.success(`${record.client} ajouté à Raccordement MES (ID: ${record.clientId})`);
+        fetchSectionCounts();
+      }
+    } catch (error) {
+      console.error('Erreur création Raccordement MES:', error);
     }
   };
 
@@ -297,41 +324,31 @@ export default function ClientSection({ section }: ClientSectionProps) {
 
     if (
       section === 'dp-en-cours' &&
-      (record.statut === 'Accord favorable' ||
-        record.statut === 'Accord tacite')
+      (record.statut === 'Accord favorable' || record.statut === 'Accord tacite')
     ) {
       toSave.section = 'dp-accordes';
       newSection = 'dp-accordes';
     }
+
     if (section === 'dp-en-cours' && record.statut === 'Refus') {
       toSave.section = 'dp-refuses';
       newSection = 'dp-refuses';
     }
-    if (
-      section === 'consuel-en-cours' &&
-      record.causeNonPresence === 'Consuel envoyé' &&
-      record.etatActuel === 'Consuel Visé'
-    ) {
+
+    if (section === 'consuel-en-cours' && record.etatActuel === 'Consuel Visé') {
       toSave.section = 'consuel-finalise';
       newSection = 'consuel-finalise';
     }
-    if (section === 'installation' && record.pvChantier === 'Reçu') {
-      toSave.section = 'consuel-en-cours';
-      newSection = 'consuel-en-cours';
+
+    if (section === 'raccordement' && record.raccordement === 'Mise en service') {
+      toSave.section = 'raccordement-mes';
+      newSection = 'raccordement-mes';
     }
 
+    const shouldCreateRaccordementCopy =
+      section === 'consuel-en-cours' && record.etatActuel === 'Consuel Visé';
+
     if (record._id) {
-      // Créer une copie dans DAACT si PV Chantier = Reçu (depuis Installation)
-      if (section === 'installation' && record.pvChantier === 'Reçu') {
-        await createDaactCopy(record);
-      }
-
-      // Créer une copie dans Raccordement si Consuel Finalisé
-      if (section === 'consuel-en-cours' && newSection === 'consuel-finalise') {
-        await createRaccordementCopy(record);
-      }
-
-      // Le client conserve son ObjectId (_id) quand il change de section
       const previousClients = [...clients];
       const optimisticRecord = { ...toSave, _id: record._id };
 
@@ -364,6 +381,10 @@ export default function ClientSection({ section }: ClientSectionProps) {
               prev.map((item) => (item._id === saved._id ? saved : item))
             );
             toast.success(`${record.client} a été mis à jour avec succès`);
+          }
+
+          if (shouldCreateRaccordementCopy) {
+            await createRaccordementCopy(saved);
           }
         } else {
           setClients(previousClients);
@@ -958,6 +979,7 @@ export default function ClientSection({ section }: ClientSectionProps) {
           section={section}
           client={editingClient}
           onSave={onSave}
+          onDelete={onDelete}
           onClose={() => {
             setShowForm(false);
             setEditingClient(null);

@@ -9,6 +9,7 @@ import Select from '@/components/ui/Select';
 import AutocompleteInput from '@/components/ui/AutocompleteInput';
 import Badge from '@/components/ui/Badge';
 import FileUpload, { UploadedFile } from '@/components/ui/FileUpload';
+import ConfirmDialog from '@/components/ui/ConfirmDialog';
 import { cn } from '@/lib/utils';
 import {
   installationStatuts,
@@ -45,6 +46,8 @@ interface ClientFormProps {
   onSave: (record: ClientRecord) => void;
   /** Fonction appelée lors de la fermeture du formulaire */
   onClose: () => void;
+  /** Fonction appelée lors de la suppression du formulaire */
+  onDelete?: (id: string) => void;
 }
 
 const dpStatuts = [
@@ -60,7 +63,7 @@ const consuelStatuts = [
   'Consuel Visé',
   'En cours de traitement',
 ];
-const raccordementStatuts = ['Demande transmise', 'Demande à effectuer'];
+const raccordementStatuts = ['Demande transmise', 'Demande à effectuer', 'Mise en service'];
 const daactStatuts = ['En attente', 'Validé', 'Refusé'];
 
 export default function ClientForm({
@@ -68,6 +71,7 @@ export default function ClientForm({
   client,
   onSave,
   onClose,
+  onDelete,
 }: ClientFormProps) {
   const [form, setForm] = useState<ClientRecord>({
     ...(typeof client?.id === 'number' ? { id: client.id } : {}),
@@ -101,6 +105,7 @@ export default function ClientForm({
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [isEditing, setIsEditing] = useState(false);
+  const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
   const [dpAccordesClients, setDpAccordesClients] = useState<string[]>([]);
   const [dpAccordesData, setDpAccordesData] = useState<
     Record<string, { noDp: string; ville: string }>
@@ -1051,6 +1056,18 @@ export default function ClientForm({
                 >
                   Annuler
                 </Button>
+                {client && onDelete && (
+                  <Button
+                    type="button"
+                    variant="danger"
+                    onClick={() => setShowDeleteConfirm(true)}
+                    disabled={isSubmitting}
+                    icon={<X className="h-3 w-3" />}
+                    className="px-2.5 py-1.5 text-[11px]"
+                  >
+                    Supprimer
+                  </Button>
+                )}
                 <Button
                   type="submit"
                   loading={isSubmitting}
@@ -1072,6 +1089,24 @@ export default function ClientForm({
           </form>
         </div>
       </div>
+
+      {/* Delete Confirmation Dialog */}
+      <ConfirmDialog
+        isOpen={showDeleteConfirm}
+        onClose={() => setShowDeleteConfirm(false)}
+        onConfirm={() => {
+          if (client?._id && onDelete) {
+            onDelete(client._id);
+          }
+          setShowDeleteConfirm(false);
+          onClose();
+        }}
+        title="Supprimer le client"
+        message={`Êtes-vous sûr de vouloir supprimer le dossier de ${client?.client} ? Cette action est irréversible.`}
+        confirmText="Supprimer"
+        cancelText="Annuler"
+        variant="danger"
+      />
     </div>
   );
 }

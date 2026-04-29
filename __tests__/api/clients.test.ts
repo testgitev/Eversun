@@ -1,30 +1,76 @@
-import { GET, POST } from '@/app/api/clients/route';
-import { NextRequest } from 'next/server';
+const { TextEncoder, TextDecoder } = require('util');
+const { ReadableStream, WritableStream, TransformStream } = require('stream/web');
+const { MessagePort, MessageChannel, MessageEvent } = require('worker_threads');
+if (typeof global.TextEncoder === 'undefined') {
+  global.TextEncoder = TextEncoder;
+}
+if (typeof global.TextDecoder === 'undefined') {
+  global.TextDecoder = TextDecoder;
+}
+if (typeof global.ReadableStream === 'undefined') {
+  global.ReadableStream = ReadableStream;
+}
+if (typeof global.WritableStream === 'undefined') {
+  global.WritableStream = WritableStream;
+}
+if (typeof global.TransformStream === 'undefined') {
+  global.TransformStream = TransformStream;
+}
+if (typeof global.MessagePort === 'undefined') {
+  global.MessagePort = MessagePort;
+}
+if (typeof global.MessageChannel === 'undefined') {
+  global.MessageChannel = MessageChannel;
+}
+if (typeof global.MessageEvent === 'undefined') {
+  global.MessageEvent = MessageEvent;
+}
+
+const undici = require('undici');
+const { Request: UndiciRequest, Response: UndiciResponse, Headers: UndiciHeaders, fetch: undiciFetch } = undici;
+
+if (typeof global.Request === 'undefined') {
+  global.Request = UndiciRequest;
+}
+if (typeof global.Response === 'undefined') {
+  global.Response = UndiciResponse;
+}
+if (typeof global.Headers === 'undefined') {
+  global.Headers = UndiciHeaders;
+}
+if (typeof global.fetch === 'undefined') {
+  global.fetch = undiciFetch;
+}
+
+const { GET, POST } = require('@/app/api/clients/route');
+const { NextRequest } = require('next/server');
 
 // Mock MongoDB connection
 jest.mock('@/lib/mongo', () => ({
   connectToDatabase: jest.fn(),
 }));
 
+jest.mock('@/lib/clientModel', () => ({
+  ClientSchema: {},
+}));
+
 // Mock mongoose
-jest.mock('mongoose', () => {
-  const actualMongoose = jest.requireActual('mongoose');
-  return {
-    ...actualMongoose,
-    models: {},
-    model: jest.fn(() => ({
-      countDocuments: jest.fn().mockResolvedValue(10),
-      find: jest.fn(() => ({
-        skip: jest.fn(() => ({
-          limit: jest.fn(() => ({
-            lean: jest.fn().mockResolvedValue([]),
-          })),
-        })),
-      })),
-      create: jest.fn().mockResolvedValue({ _id: '1' }),
-    })),
-  };
-});
+jest.mock('mongoose', () => ({
+  models: {},
+  model: jest.fn(() => ({
+    countDocuments: jest.fn().mockResolvedValue(10),
+    find: jest.fn(() => {
+      const queryBuilder: any = {
+        skip: jest.fn(() => queryBuilder),
+        limit: jest.fn(() => queryBuilder),
+        lean: jest.fn().mockResolvedValue([]),
+        select: jest.fn(() => queryBuilder),
+      };
+      return queryBuilder;
+    }),
+    create: jest.fn().mockResolvedValue({ _id: '1' }),
+  })),
+}));
 
 describe('API /api/clients', () => {
   describe('GET', () => {

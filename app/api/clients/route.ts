@@ -311,6 +311,70 @@ export async function POST(request: Request) {
         }
       }
 
+      if (
+        data.section === 'installation' &&
+        data.pvChantier === 'Reçu'
+      ) {
+        try {
+          const consuelQuery: Record<string, unknown> = {
+            section: 'consuel-en-cours',
+          };
+          if (data.clientId) {
+            consuelQuery.clientId = data.clientId;
+          } else if (data.client) {
+            consuelQuery.client = data.client;
+          }
+          const existingConsuel = await Model.findOne(consuelQuery).lean();
+          if (!existingConsuel) {
+            const consuelPayload = {
+              ...data,
+              section: 'consuel-en-cours',
+              _id: undefined,
+              stages: {
+                ...createPayload.stages,
+                'consuel-en-cours': {
+                  statut: 'En cours',
+                  date: new Date().toISOString(),
+                  updatedAt: new Date(),
+                },
+              },
+            };
+            await Model.create(consuelPayload);
+          }
+        } catch (copyError: unknown) {
+          console.error('Erreur lors de la copie vers Consuel En Cours:', copyError);
+        }
+
+        try {
+          const daactQuery: Record<string, unknown> = { section: 'daact' };
+          if (data.clientId) {
+            daactQuery.clientId = data.clientId;
+          } else if (data.client) {
+            daactQuery.client = data.client;
+          }
+          const existingDaact = await Model.findOne(daactQuery).lean();
+          if (!existingDaact) {
+            const daactPayload = {
+              ...data,
+              section: 'daact',
+              statut: 'DAACT à faire',
+              _id: undefined,
+              stages: {
+                ...createPayload.stages,
+                daact: {
+                  statut: 'DAACT à faire',
+                  date: new Date().toISOString(),
+                  updatedAt: new Date(),
+                },
+              },
+            };
+            await Model.create(daactPayload);
+          }
+        } catch (copyError: unknown) {
+          console.error('Erreur lors de la copie vers DAACT:', copyError);
+        }
+      }
+
       return NextResponse.json(client);
     } catch (err: unknown) {
       const errorMessage =

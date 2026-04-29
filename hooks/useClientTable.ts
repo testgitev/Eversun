@@ -145,18 +145,18 @@ export function useClientTablePagination({ totalItems }: UseClientTablePaginatio
   const [isPageTransitioning, setIsPageTransitioning] = useState(false);
   const [transitionDirection, setTransitionDirection] = useState<'left' | 'right' | null>(null);
 
-  const totalPages = Math.ceil(totalItems / rowsPerPage);
+  const totalPages = Math.max(1, Math.ceil(totalItems / rowsPerPage));
   const startIndex = (page - 1) * rowsPerPage;
-  const endIndex = startIndex + rowsPerPage;
+  const endIndex = Math.min(startIndex + rowsPerPage, totalItems);
 
   const handlePageChange = (newPage: number) => {
     if (newPage === page) return;
-    
-    setIsPageTransitioning(true);
+
     setTransitionDirection(newPage > page ? 'right' : 'left');
-    
+    setPage(newPage);
+    setIsPageTransitioning(true);
+
     setTimeout(() => {
-      setPage(newPage);
       setIsPageTransitioning(false);
       setTransitionDirection(null);
     }, 300);
