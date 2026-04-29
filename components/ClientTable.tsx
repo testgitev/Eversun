@@ -29,10 +29,7 @@ import {
   getStatutBadgeColor,
   getFinancementBadgeColor,
   getRaccordementBadgeColor,
-  getEtatActuelBadgeColor,
   getTypeConsuelBadgeColor,
-  getPrestataireBadgeColor,
-  getCauseNonPresenceBadgeColor,
 } from '@/lib/clientTableUtils';
 import PaginationControls from '@/components/PaginationControls';
 import {
@@ -85,8 +82,6 @@ function ClientTable({
     setFilterStatus,
     filterVille,
     setFilterVille,
-    filterPrestataire,
-    setFilterPrestataire,
     filterFinancement,
     setFilterFinancement,
     filterDateFrom,
@@ -172,9 +167,7 @@ function ClientTable({
     columns.push(
       { key: 'client', label: 'Client' },
       { key: 'pvChantierDate', label: 'PV Chantier' },
-      { key: 'causeNonPresence', label: 'Statut' },
-      { key: 'prestataire', label: 'Prestataire' },
-      { key: 'etatActuel', label: 'Etat Actuel' },
+      { key: 'statut', label: 'Statut' },
       { key: 'typeConsuel', label: 'Type de consuel demandé' },
       { key: 'dateDerniereDemarche', label: 'Date dernière démarche' },
       { key: 'commentaires', label: 'Commentaires' },
@@ -184,9 +177,7 @@ function ClientTable({
     columns.push(
       { key: 'client', label: 'Nom' },
       { key: 'pvChantierDate', label: 'PV Chantier' },
-      { key: 'causeNonPresence', label: 'Statut' },
-      { key: 'prestataire', label: 'Prestataire' },
-      { key: 'etatActuel', label: 'Etat Actuel' },
+      { key: 'statut', label: 'Statut' },
       { key: 'typeConsuel', label: 'Type de consuel demandé' },
       { key: 'dateDerniereDemarche', label: 'Date dernière démarche' },
       { key: 'commentaires', label: 'Commentaires' },
@@ -195,7 +186,6 @@ function ClientTable({
   } else if (isRaccordement) {
     columns.push(
       { key: 'client', label: 'Client' },
-      { key: 'prestataire', label: 'Prestataire' },
       { key: 'typeConsuel', label: 'Type de consuel demandé' },
       { key: 'statut', label: 'Statut' },
       { key: 'dateDerniereDemarche', label: 'Date dernière démarche' },
@@ -205,7 +195,6 @@ function ClientTable({
   } else if (isRaccordementMes) {
     columns.push(
       { key: 'client', label: 'Client' },
-      { key: 'prestataire', label: 'Prestataire' },
       { key: 'typeConsuel', label: 'Type de consuel demandé' },
       { key: 'statut', label: 'Statut' },
       { key: 'dateDerniereDemarche', label: 'Date dernière démarche' },
@@ -260,15 +249,6 @@ function ClientTable({
     }, 100);
   }, []);
 
-  const debouncedSetFilterPrestataire = useCallback((value: string) => {
-    if (debounceTimerRef.current) {
-      clearTimeout(debounceTimerRef.current);
-    }
-    debounceTimerRef.current = setTimeout(() => {
-      setFilterPrestataire(value);
-    }, 100);
-  }, []);
-
   const debouncedSetFilterFinancement = useCallback((value: string) => {
     if (debounceTimerRef.current) {
       clearTimeout(debounceTimerRef.current);
@@ -294,9 +274,6 @@ function ClientTable({
     ...(filterVille
       ? [{ key: 'ville', label: 'Ville', value: filterVille }]
       : []),
-    ...(filterPrestataire
-      ? [{ key: 'prestataire', label: 'Prestataire', value: filterPrestataire }]
-      : []),
     ...(filterFinancement
       ? [{ key: 'financement', label: 'Financement', value: filterFinancement }]
       : []),
@@ -315,9 +292,6 @@ function ClientTable({
         break;
       case 'ville':
         setFilterVille('');
-        break;
-      case 'prestataire':
-        setFilterPrestataire('');
         break;
       case 'financement':
         setFilterFinancement('');
@@ -372,19 +346,6 @@ function ClientTable({
                 </div>
                 <div>
                   <label className="block text-sm font-semibold text-secondary mb-1">
-                    Prestataire
-                  </label>
-                  <input
-                    type="text"
-                    placeholder="Filtrer par prestataire"
-                    value={filterPrestataire}
-                    onChange={(e) => debouncedSetFilterPrestataire(e.target.value)}
-                    aria-label="Filtrer par prestataire"
-                    className="w-full px-3 py-2 rounded-lg border border-primary bg-primary text-sm text-primary focus:outline-none focus:ring-2 focus:ring-cyan-500"
-                  />
-                </div>
-                <div>
-                  <label className="block text-sm font-semibold text-secondary mb-1">
                     Financement
                   </label>
                   <input
@@ -424,7 +385,6 @@ function ClientTable({
                   onClick={() => {
                     setFilterStatus('');
                     setFilterVille('');
-                    setFilterPrestataire('');
                     setFilterFinancement('');
                     setFilterDateFrom('');
                     setFilterDateTo('');
@@ -633,31 +593,11 @@ function ClientTable({
                           >
                             {item.raccordement}
                           </span>
-                        ) : col.key === 'etatActuel' && item.etatActuel ? (
-                          <span
-                            className={`inline-flex items-center px-2 py-1 rounded-lg font-semibold text-xs border shadow-sm ${getEtatActuelBadgeColor(item.etatActuel)}`}
-                          >
-                            {item.etatActuel}
-                          </span>
                         ) : col.key === 'typeConsuel' && item.typeConsuel ? (
                           <span
                             className={`inline-flex items-center px-2 py-1 rounded-lg font-semibold text-xs border shadow-sm ${getTypeConsuelBadgeColor(item.typeConsuel)}`}
                           >
                             {item.typeConsuel}
-                          </span>
-                        ) : col.key === 'prestataire' && item.prestataire ? (
-                          <span
-                            className={`inline-flex items-center px-2 py-1 rounded-lg font-semibold text-xs border shadow-sm ${getPrestataireBadgeColor(item.prestataire)}`}
-                          >
-                            <Buildings className="w-3 h-3 mr-1" weight="bold" />
-                            {item.prestataire}
-                          </span>
-                        ) : col.key === 'causeNonPresence' &&
-                          item.causeNonPresence ? (
-                          <span
-                            className={`inline-flex items-center px-2 py-1 rounded-lg font-semibold text-xs border shadow-sm ${getCauseNonPresenceBadgeColor(item.causeNonPresence)}`}
-                          >
-                            {item.causeNonPresence}
                           </span>
                         ) : col.key === 'commentaires' && item.commentaires ? (
                           <div className="flex items-center gap-1 text-slate-600 dark:text-slate-400">

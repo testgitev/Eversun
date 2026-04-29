@@ -309,22 +309,6 @@ export default function ClientModal({
                 Informations générales
               </h3>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-                {selectedClient.prestataire && (
-                  <div className="flex items-center gap-2 p-3 bg-white dark:bg-slate-800 rounded-lg border border-slate-200 dark:border-slate-700">
-                    <Buildings
-                      className="h-3.5 w-3.5 text-cyan-500"
-                      weight="bold"
-                    />
-                    <div>
-                      <p className="text-[10px] font-semibold text-slate-600 dark:text-slate-400">
-                        Prestataire
-                      </p>
-                      <p className="text-sm font-medium text-slate-900 dark:text-white">
-                        {selectedClient.prestataire}
-                      </p>
-                    </div>
-                  </div>
-                )}
                 {selectedClient.dateEnvoi && (
                   <div className="flex items-center gap-2 p-3 bg-white dark:bg-slate-800 rounded-lg border border-slate-200 dark:border-slate-700">
                     <Calendar className="h-3.5 w-3.5 text-cyan-500" weight="bold" />
@@ -561,22 +545,6 @@ export default function ClientModal({
                         </p>
                         <p className="text-sm font-medium text-slate-900 dark:text-white">
                           {selectedClient.causeNonPresence}
-                        </p>
-                      </div>
-                    </div>
-                  )}
-                  {selectedClient.etatActuel && (
-                    <div className="flex items-center gap-2 p-3 bg-white dark:bg-slate-800 rounded-lg border border-slate-200 dark:border-slate-700">
-                      <CheckCircle
-                        className="h-3.5 w-3.5 text-emerald-500"
-                        weight="bold"
-                      />
-                      <div>
-                        <p className="text-[10px] font-semibold text-slate-600 dark:text-slate-400">
-                          État actuel
-                        </p>
-                        <p className="text-sm font-medium text-slate-900 dark:text-white">
-                          {selectedClient.etatActuel}
                         </p>
                       </div>
                     </div>

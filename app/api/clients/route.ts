@@ -66,7 +66,7 @@ function mapImportedFields(doc: MappedClient): MappedClient {
     'Date PV': 'datePV',
     'Cause de non présence Consuel': 'causeNonPresence',
     Prestataire: 'prestataire',
-    'Etat Actuel': 'etatActuel',
+    'Etat Actuel': 'statut',
     'Type de consuel demandé': 'typeConsuel',
     'Date dernière démarche': 'dateDerniereDemarche',
     Commentaires: 'commentaires',
@@ -122,11 +122,12 @@ function mapImportedFields(doc: MappedClient): MappedClient {
 
   // Si pas de section, déterminer selon le statut
   if (!mapped.section) {
-    if (mapped.statut === 'Accord favorable') {
+    const normalizedStatut = (mapped.statut as string | undefined)?.trim();
+    if (normalizedStatut === 'Accord favorable' || normalizedStatut === 'Accord tacite') {
       mapped.section = 'dp-accordes';
-    } else if (mapped.statut === 'Refus') {
+    } else if (normalizedStatut === 'Refus') {
       mapped.section = 'dp-refuses';
-    } else if (mapped.statut === 'ABF') {
+    } else if (normalizedStatut === 'ABF') {
       mapped.section = 'dp-en-cours';
     } else {
       mapped.section = 'dp-en-cours';

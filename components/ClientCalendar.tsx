@@ -4,7 +4,7 @@ import { useMemo } from 'react';
 import { format } from 'date-fns';
 import { fr } from 'date-fns/locale/fr';
 import { ClientRecord, Section } from '@/types/client';
-import { Bell, Warning, Buildings, MapPin } from '@phosphor-icons/react';
+import { Bell, Warning, MapPin } from '@phosphor-icons/react';
 
 interface ClientCalendarProps {
   section: Section;
@@ -134,12 +134,6 @@ export default function ClientCalendar({
                     <div className="font-bold text-gray-900 dark:text-white text-lg">
                       {item.client}
                     </div>
-                    {item.prestataire && (
-                      <div className="text-sm text-gray-600 dark:text-gray-400 mt-1 flex items-center gap-1">
-                        <Buildings className="h-3 w-3" />
-                        {item.prestataire}
-                      </div>
-                    )}
                     {item.ville && (
                       <div className="text-sm text-gray-600 dark:text-gray-400 mt-1 flex items-center gap-1">
                         <MapPin className="h-3 w-3" />
@@ -187,12 +181,6 @@ export default function ClientCalendar({
                     <div className="font-bold text-gray-900 dark:text-white">
                       {item.client}
                     </div>
-                    {item.prestataire && (
-                      <div className="text-sm text-gray-600 dark:text-gray-400 mt-1 flex items-center gap-1">
-                        <Buildings className="h-3 w-3" />
-                        {item.prestataire}
-                      </div>
-                    )}
                     {item.ville && (
                       <div className="text-sm text-gray-600 dark:text-gray-400 mt-1 flex items-center gap-1">
                         <MapPin className="h-3 w-3" />

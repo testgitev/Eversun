@@ -32,7 +32,6 @@ interface AggregatedClient {
   name: string;
   stages: Record<string, ClientStage>;
   ville?: string;
-  prestataire?: string;
   financement?: string;
 }
 
@@ -70,7 +69,6 @@ export default function ClientAggregationView() {
         const aggregatedClients: AggregatedClient[] = data.map((item: any) => ({
           name: item.client,
           ville: item.ville,
-          prestataire: item.prestataire,
           financement: item.financement,
           stages: item.stages || {},
         }));
@@ -195,8 +193,7 @@ export default function ClientAggregationView() {
   const filteredClients = clients.filter(
     (client) =>
       client.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      client.ville?.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      client.prestataire?.toLowerCase().includes(searchQuery.toLowerCase())
+      client.ville?.toLowerCase().includes(searchQuery.toLowerCase())
   );
 
   if (loading) {
@@ -285,14 +282,6 @@ export default function ClientAggregationView() {
                               <span className="flex items-center gap-1">
                                 <span className="w-1.5 h-1.5 rounded-full bg-slate-300 dark:bg-slate-600" />
                                 {client.ville}
-                              </span>
-                            </>
-                          )}
-                          {client.prestataire && (
-                            <>
-                              <span className="text-slate-300 dark:text-slate-600">•</span>
-                              <span className="px-2 py-0.5 bg-slate-100 dark:bg-slate-700 rounded-full text-[10px] font-medium">
-                                {client.prestataire}
                               </span>
                             </>
                           )}

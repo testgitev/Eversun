@@ -82,10 +82,6 @@ export async function PUT(
       (data.pvChantier as string) ||
       ((existing as any).pvChantier as string) ||
       '';
-    const currentEtatActuel =
-      (data.etatActuel as string) ||
-      ((existing as any).etatActuel as string) ||
-      '';
     const currentRaccordement =
       (data.raccordement as string) ||
       ((existing as any).raccordement as string) ||
@@ -113,7 +109,7 @@ export async function PUT(
 
     if (
       currentSection === 'consuel-en-cours' &&
-      currentEtatActuel === 'Consuel Visé'
+      currentStatut.trim().toLowerCase() === 'consuel visé'
     ) {
       payload.section = 'consuel-finalise';
     }
@@ -261,8 +257,8 @@ export async function PUT(
 
     if (
       updated.section === 'consuel-finalise' &&
-      (data.etatActuel === 'Consuel Visé' ||
-        updated.etatActuel === 'Consuel Visé')
+      (((data.statut as string)?.trim().toLowerCase() === 'consuel visé') ||
+        (updated.statut as string)?.trim().toLowerCase() === 'consuel visé')
     ) {
       try {
         const query: Record<string, unknown> = {
@@ -384,10 +380,6 @@ export async function PATCH(
       (data.pvChantier as string) ||
       ((existing as any).pvChantier as string) ||
       '';
-    const currentEtatActuel =
-      (data.etatActuel as string) ||
-      ((existing as any).etatActuel as string) ||
-      '';
     const currentRaccordement =
       (data.raccordement as string) ||
       ((existing as any).raccordement as string) ||
@@ -418,7 +410,7 @@ export async function PATCH(
     // CONSUEL EN COURS transitions
     if (
       currentSection === 'consuel-en-cours' &&
-      currentEtatActuel === 'Consuel Visé'
+      currentStatut.trim().toLowerCase() === 'consuel visé'
     ) {
       payload.section = 'consuel-finalise';
     }
@@ -531,8 +523,8 @@ export async function PATCH(
 
     if (
       updated.section === 'consuel-finalise' &&
-      (data.etatActuel === 'Consuel Visé' ||
-        updated.etatActuel === 'Consuel Visé')
+      (((data.statut as string)?.trim().toLowerCase() === 'consuel visé') ||
+        (updated.statut as string)?.trim().toLowerCase() === 'consuel visé')
     ) {
       try {
         const query: Record<string, unknown> = {

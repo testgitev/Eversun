@@ -7,7 +7,6 @@ import {
   FileText,
   Calendar,
   MapPin,
-  Buildings,
   Pencil,
   Trash,
   ArrowsLeftRight,
@@ -34,11 +33,10 @@ type SortField =
   | 'dateEnvoi'
   | 'dateEstimative'
   | 'ville'
-  | 'prestataire'
   | 'typeConsuel';
 type SortDirection = 'asc' | 'desc';
 type CardView = 'compact' | 'detailed';
-type GroupBy = 'none' | 'statut' | 'ville' | 'prestataire' | 'typeConsuel';
+type GroupBy = 'none' | 'statut' | 'ville' | 'typeConsuel';
 
 export default function ClientGrid({
   section,
@@ -79,8 +77,8 @@ export default function ClientGrid({
             aStatus = a.statut || '';
             bStatus = b.statut || '';
           } else if (section.startsWith('consuel')) {
-            aStatus = a.causeNonPresence || '';
-            bStatus = b.causeNonPresence || '';
+            aStatus = a.statut || '';
+            bStatus = b.statut || '';
           } else if (section === 'raccordement' || section === 'raccordement-mes') {
             aStatus = a.statut || a.raccordement || '';
             bStatus = b.statut || b.raccordement || '';
@@ -104,9 +102,6 @@ export default function ClientGrid({
         case 'ville':
           comparison = (a.ville || '').localeCompare(b.ville || '');
           break;
-        case 'prestataire':
-          comparison = (a.prestataire || '').localeCompare(b.prestataire || '');
-          break;
         case 'typeConsuel':
           comparison = (a.typeConsuel || '').localeCompare(b.typeConsuel || '');
           break;
@@ -129,15 +124,10 @@ export default function ClientGrid({
 
       switch (groupBy) {
         case 'statut':
-          key = section.startsWith('consuel')
-            ? item.etatActuel || 'Non défini'
-            : item.statut || 'Non défini';
+          key = item.statut || 'Non défini';
           break;
         case 'ville':
           key = item.ville || 'Non défini';
-          break;
-        case 'prestataire':
-          key = item.prestataire || 'Non défini';
           break;
         case 'typeConsuel':
           key = item.typeConsuel || 'Non défini';
@@ -232,7 +222,7 @@ export default function ClientGrid({
               statusValue = client.statut || '';
               statusLabel = 'DAACT';
             } else if (section.startsWith('consuel')) {
-              statusValue = client.causeNonPresence || '';
+              statusValue = client.statut || '';
               statusLabel = 'Statut';
             } else if (section === 'raccordement' || section === 'raccordement-mes') {
               statusValue = client.statut || client.raccordement || '';
@@ -330,7 +320,7 @@ export default function ClientGrid({
                       </div>
                     </div>
                   )}
-                  {client.etatActuel && (
+                  {client.statut && (
                     <div className="flex items-center gap-3">
                       <div className="p-2 rounded-lg bg-gradient-to-r from-purple-500 to-violet-500 dark:from-purple-600 dark:to-violet-600">
                         <CheckCircle
@@ -343,7 +333,7 @@ export default function ClientGrid({
                           Statut
                         </span>
                         <span className="inline-block px-2 py-0.5 rounded-full text-xs font-bold bg-gradient-to-r from-purple-500 to-violet-500 dark:from-purple-600 dark:to-violet-600 text-purple-100 dark:text-purple-200 shadow-sm">
-                          {client.etatActuel}
+                          {client.statut}
                         </span>
                       </div>
                     </div>
@@ -371,19 +361,6 @@ export default function ClientGrid({
                 </>
               ) : (
                 <>
-                  {client.prestataire && (
-                    <div className="flex items-center gap-3">
-                      <div className="p-2 rounded-lg bg-teal-50 dark:bg-teal-900/30">
-                        <Buildings
-                          className="h-4 w-4 text-teal-600 dark:text-teal-400"
-                          weight="bold"
-                        />
-                      </div>
-                      <span className="text-secondary truncate">
-                        {client.prestataire}
-                      </span>
-                    </div>
-                  )}
                   {client.dateEnvoi && (
                     <div className="flex items-center gap-3">
                       <div className="p-2 rounded-lg bg-teal-50 dark:bg-teal-900/30">
@@ -505,7 +482,6 @@ export default function ClientGrid({
               <option value="dateEnvoi">Date d'envoi</option>
               <option value="dateEstimative">Date estimative</option>
               <option value="ville">Ville</option>
-              <option value="prestataire">Prestataire</option>
               <option value="typeConsuel">Type Consuel</option>
             </select>
           </div>
@@ -536,7 +512,6 @@ export default function ClientGrid({
               <option value="none">Aucun</option>
               <option value="statut">Statut</option>
               <option value="ville">Ville</option>
-              <option value="prestataire">Prestataire</option>
               <option value="typeConsuel">Type Consuel</option>
             </select>
           </div>

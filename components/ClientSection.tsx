@@ -304,7 +304,7 @@ export default function ClientSection({ section }: ClientSectionProps) {
     sectionItems.forEach((item) => {
       let key: string;
       if (section.startsWith('consuel')) {
-        key = item.etatActuel || 'Non défini';
+        key = item.statut || 'Non défini';
       } else if (section.startsWith('raccordement')) {
         key = item.raccordement || 'Non défini';
       } else {
@@ -322,15 +322,17 @@ export default function ClientSection({ section }: ClientSectionProps) {
     const oldSection = section;
     let newSection = record.section;
 
+    const normalizedStatut = record.statut?.trim() || '';
+
     if (
       section === 'dp-en-cours' &&
-      (record.statut === 'Accord favorable' || record.statut === 'Accord tacite')
+      (normalizedStatut === 'Accord favorable' || normalizedStatut === 'Accord tacite')
     ) {
       toSave.section = 'dp-accordes';
       newSection = 'dp-accordes';
     }
 
-    if (section === 'dp-en-cours' && record.statut === 'Refus') {
+    if (section === 'dp-en-cours' && normalizedStatut === 'Refus') {
       toSave.section = 'dp-refuses';
       newSection = 'dp-refuses';
     }
@@ -341,7 +343,10 @@ export default function ClientSection({ section }: ClientSectionProps) {
       toSave.statut = toSave.statut || 'DAACT à faire';
     }
 
-    if (section === 'consuel-en-cours' && record.etatActuel === 'Consuel Visé') {
+    if (
+      section === 'consuel-en-cours' &&
+      record.statut?.trim().toLowerCase() === 'consuel visé'
+    ) {
       toSave.section = 'consuel-finalise';
       newSection = 'consuel-finalise';
     }
@@ -352,7 +357,8 @@ export default function ClientSection({ section }: ClientSectionProps) {
     }
 
     const shouldCreateRaccordementCopy =
-      section === 'consuel-en-cours' && record.etatActuel === 'Consuel Visé';
+      section === 'consuel-en-cours' &&
+      record.statut?.trim().toLowerCase() === 'consuel visé';
 
     if (record._id) {
       const previousClients = [...clients];
@@ -913,65 +919,6 @@ export default function ClientSection({ section }: ClientSectionProps) {
                     </div>
                   </div>
 
-                  {/* Statistiques par prestataire */}
-                  {sectionItems.some((c) => c.prestataire) && (
-                    <div className="bg-white dark:bg-gray-800 rounded-lg p-6 border border-gray-200 dark:border-gray-700 shadow-md">
-                      <h4 className="text-md font-semibold text-gray-900 dark:text-white mb-4">
-                        Répartition par prestataire
-                      </h4>
-                      <div className="space-y-3">
-                        {Object.entries(
-                          sectionItems.reduce(
-                            (acc, client) => {
-                              if (client.prestataire) {
-                                acc[client.prestataire] =
-                                  (acc[client.prestataire] || 0) + 1;
-                              }
-                              return acc;
-                            },
-                            {} as Record<string, number>
-                          )
-                        )
-                          .sort((a, b) => b[1] - a[1])
-                          .slice(0, 5)
-                          .map(([prestataire, count]) => {
-                            const percentage =
-                              sectionItems.length > 0
-                                ? (count / sectionItems.length) * 100
-                                : 0;
-                            const colors = [
-                              'bg-primary-500',
-                              'bg-success-500',
-                              'bg-warning-500',
-                              'bg-accent-500',
-                              'bg-error-500',
-                            ];
-                            const colorIndex =
-                              Object.keys(statusCounts).indexOf(prestataire) %
-                              colors.length;
-
-                            return (
-                              <div key={prestataire}>
-                                <div className="flex items-center justify-between mb-1">
-                                  <span className="text-sm font-medium text-gray-700 dark:text-gray-300">
-                                    {prestataire}
-                                  </span>
-                                  <span className="text-sm font-bold text-gray-900 dark:text-white">
-                                    {count} ({percentage.toFixed(1)}%)
-                                  </span>
-                                </div>
-                                <div className="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-2 overflow-hidden">
-                                  <div
-                                    className={`h-2 rounded-full ${colors[colorIndex]} shadow-md transition-all duration-500`}
-                                    style={{ width: `${percentage}%` }}
-                                  />
-                                </div>
-                              </div>
-                            );
-                          })}
-                      </div>
-                    </div>
-                  )}
                 </div>
               </div>
             )}

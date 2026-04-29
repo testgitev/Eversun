@@ -60,8 +60,8 @@ const dpStatuts = [
 const consuelStatuts = [
   'Avis de visite',
   'Demande à effectuer',
-  'Consuel Visé',
   'En cours de traitement',
+  'Consuel visé',
 ];
 const raccordementStatuts = ['Demande transmise', 'Demande à effectuer', 'Mise en service'];
 const daactStatuts = ['En attente', 'Validé', 'Refusé'];
@@ -78,7 +78,6 @@ export default function ClientForm({
 
     section,
     client: client?.client || '',
-    prestataire: client?.prestataire || '',
     statut: client?.statut || '',
     dateEnvoi: client?.dateEnvoi ?? '',
     dateEstimative: client?.dateEstimative ?? '',
@@ -93,7 +92,6 @@ export default function ClientForm({
     pvChantierDate: client?.pvChantierDate ?? '',
     datePV: client?.datePV ?? '',
     causeNonPresence: client?.causeNonPresence ?? '',
-    etatActuel: client?.etatActuel ?? '',
     typeConsuel: client?.typeConsuel ?? '',
     dateDerniereDemarche: client?.dateDerniereDemarche ?? '',
     commentaires: client?.commentaires ?? '',
@@ -159,7 +157,6 @@ export default function ClientForm({
         ...(typeof client?.id === 'number' ? { id: client.id } : {}),
         section,
         client: client?.client || '',
-        prestataire: client?.prestataire || '',
         statut: client?.statut || '',
         dateEnvoi: client?.dateEnvoi ?? '',
         dateEstimative: client?.dateEstimative ?? '',
@@ -173,7 +170,6 @@ export default function ClientForm({
         pvChantier: client?.pvChantier ?? '',
         pvChantierDate: client?.pvChantierDate ?? '',
         causeNonPresence: client?.causeNonPresence ?? '',
-        etatActuel: client?.etatActuel ?? '',
         typeConsuel: client?.typeConsuel ?? '',
         dateDerniereDemarche: client?.dateDerniereDemarche ?? '',
         datePV: client?.datePV ?? '',
@@ -354,7 +350,10 @@ export default function ClientForm({
       const { id, ...rest } = form;
 
       let finalSection = section;
-      if (section === 'consuel-en-cours' && form.etatActuel === 'Consuel OK') {
+      if (
+        section === 'consuel-en-cours' &&
+        form.statut?.trim().toLowerCase() === 'consuel visé'
+      ) {
         finalSection = 'consuel-finalise';
       }
 
@@ -380,7 +379,6 @@ export default function ClientForm({
         numeroContrat: form.numeroContrat ?? '',
         typeConsuel: form.typeConsuel ?? '',
         causeNonPresence: form.causeNonPresence ?? '',
-        etatActuel: form.etatActuel ?? '',
         commentaires: form.commentaires ?? '',
       };
 
@@ -512,7 +510,7 @@ export default function ClientForm({
           </div>
           <form onSubmit={handleSubmit} className="space-y-3">
             {section.startsWith('consuel') &&
-              form.etatActuel === 'Consuel OK' && (
+              form.statut?.trim().toLowerCase() === 'consuel visé' && (
                 <div className="bg-primary-50 dark:bg-primary-900/20 border border-primary-200 dark:border-primary-800 rounded p-1.5">
                   <div className="flex items-center gap-1.5">
                     <Info className="h-3.5 w-3.5 text-primary-600 dark:text-primary-400" />
@@ -782,33 +780,11 @@ export default function ClientForm({
                   />
                   <Select
                     label="Statut"
-                    value={form.causeNonPresence}
-                    onChange={(e) =>
-                      handleChange('causeNonPresence', e.target.value)
-                    }
-                    options={[
-                      {
-                        value: 'Consuel non demandé',
-                        label: 'Consuel non demandé',
-                      },
-                      {
-                        value: 'Consuel refusé pour cause technique',
-                        label: 'Consuel refusé pour cause technique',
-                      },
-                      {
-                        value: 'Consuel refusé pour cause administrative',
-                        label: 'Consuel refusé pour cause administrative',
-                      },
-                      { value: 'Consuel envoyé', label: 'Consuel envoyé' },
-                    ]}
-                    placeholder="Sélectionner un statut"
-                  />
-                  <Select
-                    label="Etat Actuel"
-                    value={form.etatActuel}
-                    onChange={(e) => handleChange('etatActuel', e.target.value)}
+                    value={form.statut}
+                    onChange={(e) => handleChange('statut', e.target.value)}
                     options={statutOptions}
-                    placeholder="Sélectionner un état"
+                    placeholder="Sélectionner un statut"
+                    error={errors.statut}
                   />
                   <Select
                     label="Type de consuel demandé"

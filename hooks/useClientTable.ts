@@ -15,7 +15,6 @@ export function useClientTableFilters({ items, section }: UseClientTableFiltersP
   const [showFilters, setShowFilters] = useState(false);
   const [filterStatus, setFilterStatus] = useState<string>('');
   const [filterVille, setFilterVille] = useState<string>('');
-  const [filterPrestataire, setFilterPrestataire] = useState<string>('');
   const [filterFinancement, setFilterFinancement] = useState<string>('');
   const [filterDateFrom, setFilterDateFrom] = useState<string>('');
   const [filterDateTo, setFilterDateTo] = useState<string>('');
@@ -44,13 +43,6 @@ export function useClientTableFilters({ items, section }: UseClientTableFiltersP
     if (filterVille) {
       filtered = filtered.filter((item) =>
         item.ville?.toLowerCase().includes(filterVille.toLowerCase())
-      );
-    }
-
-    // Prestataire filter
-    if (filterPrestataire) {
-      filtered = filtered.filter((item) =>
-        item.prestataire?.toLowerCase().includes(filterPrestataire.toLowerCase())
       );
     }
 
@@ -92,13 +84,12 @@ export function useClientTableFilters({ items, section }: UseClientTableFiltersP
     }
 
     return filtered;
-  }, [items, search, filterStatus, filterVille, filterPrestataire, filterFinancement, filterDateFrom, filterDateTo, sortKey, sortDir]);
+  }, [items, search, filterStatus, filterVille, filterFinancement, filterDateFrom, filterDateTo, sortKey, sortDir]);
 
   const resetFilters = () => {
     setSearch('');
     setFilterStatus('');
     setFilterVille('');
-    setFilterPrestataire('');
     setFilterFinancement('');
     setFilterDateFrom('');
     setFilterDateTo('');
@@ -120,8 +111,6 @@ export function useClientTableFilters({ items, section }: UseClientTableFiltersP
     setFilterStatus,
     filterVille,
     setFilterVille,
-    filterPrestataire,
-    setFilterPrestataire,
     filterFinancement,
     setFilterFinancement,
     filterDateFrom,

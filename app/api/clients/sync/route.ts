@@ -114,7 +114,7 @@ export async function GET(request: Request) {
       if (record.section) {
         // Déterminer le bon statut selon la section
         let stageStatut = record.statut || '';
-        if (record.section.startsWith('consuel') && record.etatActuel) {
+        if (record.section.startsWith('consuel') && !stageStatut && record.etatActuel) {
           stageStatut = record.etatActuel;
         } else if (record.section.startsWith('raccordement') && record.raccordement) {
           stageStatut = record.raccordement;
@@ -122,7 +122,6 @@ export async function GET(request: Request) {
 
         groupedClients[name].stages[record.section] = {
           statut: stageStatut,
-          etatActuel: record.etatActuel,
           raccordement: record.raccordement,
           date: record.dateEnvoi || record.dateDerniereDemarche || '',
           noDp: record.noDp,
@@ -134,7 +133,6 @@ export async function GET(request: Request) {
       
       // Conserver les infos les plus récentes
       if (record.ville) groupedClients[name].ville = record.ville;
-      if (record.prestataire) groupedClients[name].prestataire = record.prestataire;
       if (record.financement) groupedClients[name].financement = record.financement;
     });
     
