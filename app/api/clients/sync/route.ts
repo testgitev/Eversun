@@ -83,8 +83,64 @@ export async function GET(request: Request) {
       return NextResponse.json({ data: clientRecord });
     }
 
+    // Agréger les clients par nom pour avoir une seule ligne par client
     const clientRecords = await Model.find().sort({ client: 1 }).lean();
-    return NextResponse.json({ data: clientRecords });
+    
+    // Regrouper par nom de client
+    const groupedClients: Record<string, any> = {};
+    
+    clientRecords.forEach((record: any) => {
+      const name = record.client;
+      
+      if (!groupedClients[name]) {
+        groupedClients[name] = {
+          client: name,
+          ville: record.ville,
+          prestataire: record.prestataire,
+          financement: record.financement,
+          stages: {},
+        };
+      }
+      
+      // Fusionner les stages de toutes les sections
+      if (record.stages) {
+        groupedClients[name].stages = {
+          ...groupedClients[name].stages,
+          ...record.stages,
+        };
+      }
+      
+      // Ajouter la section actuelle comme stage
+      if (record.section) {
+        // Déterminer le bon statut selon la section
+        let stageStatut = record.statut || '';
+        if (record.section.startsWith('consuel') && record.etatActuel) {
+          stageStatut = record.etatActuel;
+        } else if (record.section.startsWith('raccordement') && record.raccordement) {
+          stageStatut = record.raccordement;
+        }
+
+        groupedClients[name].stages[record.section] = {
+          statut: stageStatut,
+          etatActuel: record.etatActuel,
+          raccordement: record.raccordement,
+          date: record.dateEnvoi || record.dateDerniereDemarche || '',
+          noDp: record.noDp,
+          financement: record.financement,
+          typeConsuel: record.typeConsuel,
+          updatedAt: record.updatedAt,
+        };
+      }
+      
+      // Conserver les infos les plus récentes
+      if (record.ville) groupedClients[name].ville = record.ville;
+      if (record.prestataire) groupedClients[name].prestataire = record.prestataire;
+      if (record.financement) groupedClients[name].financement = record.financement;
+    });
+    
+    const aggregatedData = Object.values(groupedClients);
+    
+    return NextResponse.json({ data: aggregatedData });
   } catch (error: any) {
     console.error('Error fetching clients:', error);
     return NextResponse.json(

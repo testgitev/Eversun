@@ -264,8 +264,12 @@ export async function POST(request: Request) {
         data.pvChantierDate ||
         '';
 
+      // Générer un clientId unique si non fourni
+      const clientId = data.clientId || `CLI-${Date.now()}-${Math.random().toString(36).substr(2, 9).toUpperCase()}`;
+
       const createPayload = {
         ...data,
+        clientId,
         stages: {
           [data.section]: {
             statut: data.statut || '',

@@ -104,6 +104,58 @@ export default function ClientSection({ section }: ClientSectionProps) {
     fetchSectionCounts();
   }, [section]);
 
+  // Créer une copie du client dans la section DAACT (même clientId, nouveau _id MongoDB)
+  const createDaactCopy = async (record: ClientRecord) => {
+    try {
+      const daactRecord = {
+        ...record,
+        section: 'daact' as Section,
+        statut: 'DAACT à faire',
+      };
+      // Retirer _id pour créer une nouvelle entrée, mais garder le clientId
+      const { _id, id, ...toSend } = daactRecord;
+
+      const res = await fetch('/api/clients', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(toSend),
+      });
+
+      if (res.ok) {
+        toast.success(`${record.client} ajouté à DAACT (ID: ${record.clientId})`);
+        fetchSectionCounts();
+      }
+    } catch (error) {
+      console.error('Erreur création DAACT:', error);
+    }
+  };
+
+  // Créer une copie du client dans la section Raccordement (même clientId)
+  const createRaccordementCopy = async (record: ClientRecord) => {
+    try {
+      const raccordementRecord = {
+        ...record,
+        section: 'raccordement' as Section,
+        statut: 'Raccordement à faire',
+      };
+      // Retirer _id pour créer une nouvelle entrée, mais garder le clientId
+      const { _id, id, ...toSend } = raccordementRecord;
+
+      const res = await fetch('/api/clients', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(toSend),
+      });
+
+      if (res.ok) {
+        toast.success(`${record.client} ajouté à Raccordement (ID: ${record.clientId})`);
+        fetchSectionCounts();
+      }
+    } catch (error) {
+      console.error('Erreur création Raccordement:', error);
+    }
+  };
+
   // Vérifier les dates estimatives pour DP En Cours et déclencher des notifications
   useEffect(() => {
     const today = new Date();
@@ -269,6 +321,17 @@ export default function ClientSection({ section }: ClientSectionProps) {
     }
 
     if (record._id) {
+      // Créer une copie dans DAACT si PV Chantier = Reçu (depuis Installation)
+      if (section === 'installation' && record.pvChantier === 'Reçu') {
+        await createDaactCopy(record);
+      }
+
+      // Créer une copie dans Raccordement si Consuel Finalisé
+      if (section === 'consuel-en-cours' && newSection === 'consuel-finalise') {
+        await createRaccordementCopy(record);
+      }
+
+      // Le client conserve son ObjectId (_id) quand il change de section
       const previousClients = [...clients];
       const optimisticRecord = { ...toSave, _id: record._id };
 

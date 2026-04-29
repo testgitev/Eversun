@@ -93,6 +93,7 @@ export default function Dashboard({
         onCollapsedChange={setIsSidebarCollapsed}
         isMobileOpen={isMobileSidebarOpen}
         onMobileClose={() => setIsMobileSidebarOpen(false)}
+        onNavigateHome={() => window.location.href = '/'}
       />
       <main
         className={`flex-1 overflow-auto transition-all duration-200 relative ${

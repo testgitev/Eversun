@@ -35,6 +35,8 @@ interface SidebarProps {
   isMobileOpen?: boolean;
   /** Callback pour fermer la sidebar mobile */
   onMobileClose?: () => void;
+  /** Callback pour naviguer vers l'accueil */
+  onNavigateHome?: () => void;
 }
 
 const sectionGroups = [
@@ -112,6 +114,7 @@ function Sidebar({
   onCollapsedChange,
   isMobileOpen = false,
   onMobileClose,
+  onNavigateHome,
 }: SidebarProps) {
   const [isCollapsed, setIsCollapsed] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
@@ -239,6 +242,30 @@ function Sidebar({
         )}
 
         <nav className="py-2 flex-1 overflow-y-auto">
+          {/* Accueil Button */}
+          <div className="px-1.5 mb-4">
+            <button
+              onClick={onNavigateHome}
+              className={`w-full text-left rounded-lg text-xs font-medium transition-all duration-200 ease-out flex items-center group relative overflow-hidden
+              ${
+                isCollapsed
+                  ? 'justify-center px-1.5 py-2.5'
+                  : 'px-3 py-2.5 gap-2.5'
+              }
+              text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:ring-offset-1 focus:ring-offset-white dark:focus:ring-offset-gray-900`}
+              aria-label="Accueil"
+            >
+              <House
+                weight="regular"
+                className="h-4.5 w-4.5 flex-shrink-0 transition-all duration-200 text-slate-400 dark:text-slate-500 group-hover:text-primary-500 dark:group-hover:text-primary-400"
+                aria-hidden="true"
+              />
+              {!isCollapsed && (
+                <span className="flex-1 relative z-10">Accueil</span>
+              )}
+            </button>
+          </div>
+
           {filteredSectionGroups.map((group, groupIndex) => {
             const isGroupOpen =
               isCollapsed ||

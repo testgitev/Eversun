@@ -5,6 +5,8 @@ import logger from '@/lib/logger';
 
 export const ClientSchema = new mongoose.Schema({
   id: { type: mongoose.Schema.Types.Mixed, required: false },
+  /** Identifiant unique persistant du client à travers toutes les sections */
+  clientId: { type: String, required: false, index: true },
   section: {
     type: String,
     required: true,
@@ -92,6 +94,7 @@ ClientSchema.post('findOne', function (doc: any) {
 export interface IClient extends mongoose.Document {
   section: Section;
   client: string;
+  clientId?: string;
   prestataire?: string;
   statut?: string;
   dateEnvoi?: string;

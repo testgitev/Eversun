@@ -766,7 +766,7 @@ export default function ClientModal({
         {/* Footer */}
         <div className="flex justify-between items-center p-4 border-t border-primary bg-secondary">
           <div className="text-sm text-tertiary">
-            ID: {selectedClient._id || selectedClient.id}
+            ID: {selectedClient.clientId || selectedClient._id || selectedClient.id}
           </div>
           <button
             onClick={onClose}

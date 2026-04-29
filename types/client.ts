@@ -23,6 +23,8 @@ export interface ClientRecord {
   _id?: string;
   /** Identifiant alternatif (peut être un nombre ou une chaîne) */
   id?: number | string;
+  /** Identifiant unique persistant du client à travers toutes les sections */
+  clientId?: string;
   /** Section actuelle du dossier */
   section: Section;
   /** Nom du client (requis) */
