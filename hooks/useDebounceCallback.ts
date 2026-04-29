@@ -1,4 +1,4 @@
-import { useCallback, useRef } from 'react';
+import { useCallback, useEffect, useRef } from 'react';
 
 /**
  * Hook personnalisé pour debounce une fonction callback
@@ -10,20 +10,25 @@ function useDebounceCallback<T extends (...args: unknown[]) => unknown>(
   callback: T,
   delay: number = 500
 ): T {
-  const timeoutRef = useRef<NodeJS.Timeout | null>(null);
+  const timeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
-  return useCallback(
-    (...args: Parameters<T>) => {
+  useEffect(() => {
+    return () => {
       if (timeoutRef.current) {
         clearTimeout(timeoutRef.current);
       }
+    };
+  }, []);
 
-      timeoutRef.current = setTimeout(() => {
-        callback(...args);
-      }, delay);
-    },
-    [callback, delay]
-  ) as T;
+  return useCallback(function (this: unknown, ...args: Parameters<T>) {
+    if (timeoutRef.current) {
+      clearTimeout(timeoutRef.current);
+    }
+
+    timeoutRef.current = setTimeout(() => {
+      callback.apply(this, args);
+    }, delay);
+  }, [callback, delay]) as T;
 }
 
 export default useDebounceCallback;

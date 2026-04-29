@@ -73,10 +73,58 @@ export async function PUT(
       return NextResponse.json({ error: 'Client non trouvé' }, { status: 404 });
     }
 
-    const updatedStages = buildStageUpdate(data, existing as ExistingDocument);
+    const payload = { ...data };
+    const currentSection =
+      (data.section as string) || (existing as ExistingDocument).section;
+    const currentStatut =
+      (data.statut as string) || (existing as ExistingDocument).statut || '';
+    const currentPvChantier =
+      (data.pvChantier as string) ||
+      ((existing as any).pvChantier as string) ||
+      '';
+    const currentRaccordement =
+      (data.raccordement as string) ||
+      ((existing as any).raccordement as string) ||
+      '';
+
+    const normalizedStatut = currentStatut.trim();
+    const isDpAccordTransition =
+      (existing.section === 'dp-en-cours' || payload.section === 'dp-accordes') &&
+      (normalizedStatut === 'Accord favorable' ||
+        normalizedStatut === 'Accord tacite');
+    const isDpRefusTransition =
+      (existing.section === 'dp-en-cours' || payload.section === 'dp-refuses') &&
+      normalizedStatut === 'Refus';
+
+    if (isDpAccordTransition) {
+      payload.section = 'dp-accordes';
+    } else if (isDpRefusTransition) {
+      payload.section = 'dp-refuses';
+    }
+
+    if (currentSection === 'installation' && currentPvChantier === 'Reçu') {
+      payload.section = 'daact';
+      payload.statut = payload.statut || 'DAACT à faire';
+    }
+
+    if (
+      currentSection === 'consuel-en-cours' &&
+      currentStatut.trim().toLowerCase() === 'consuel visé'
+    ) {
+      payload.section = 'consuel-finalise';
+    }
+
+    if (
+      currentSection === 'raccordement' &&
+      currentRaccordement === 'Mise en service'
+    ) {
+      payload.section = 'raccordement-mes';
+    }
+
+    const updatedStages = buildStageUpdate(payload, existing as ExistingDocument);
     const updated = await Model.findByIdAndUpdate(
       id,
-      { ...data, stages: updatedStages },
+      { ...payload, stages: updatedStages },
       { new: true }
     );
 
@@ -86,18 +134,32 @@ export async function PUT(
 
     // Si le client est dans dp-accordes avec statut Accord tacite ou Accord favorable,
     // créer une copie dans installation
-    const newSection = data.section || (existing as ExistingDocument).section;
-    const newStatut = data.statut || (existing as ExistingDocument).statut;
+    const newSection = payload.section || (existing as ExistingDocument).section;
+    const newStatut = payload.statut || (existing as ExistingDocument).statut;
+    const newPvChantier =
+      (payload.pvChantier as string) ||
+      (updated as any).pvChantier ||
+      (existing as any).pvChantier;
+    const clientId =
+      data.clientId ||
+      (updated as any).clientId ||
+      (existing as any).clientId;
+
     if (
       newSection === 'dp-accordes' &&
       (newStatut === 'Accord tacite' || newStatut === 'Accord favorable')
     ) {
       try {
-        // Vérifier si une copie existe déjà dans installation
-        const existingInInstallation = await Model.findOne({
-          client: (existing as ExistingDocument).client,
+        const installationQuery: Record<string, unknown> = {
           section: 'installation',
-        }).lean();
+        };
+        if (clientId) {
+          installationQuery.clientId = clientId;
+        } else {
+          installationQuery.client = (existing as ExistingDocument).client;
+        }
+
+        const existingInInstallation = await Model.findOne(installationQuery).lean();
 
         if (!existingInInstallation) {
           const installationPayload = {
@@ -117,11 +179,163 @@ export async function PUT(
           await Model.create(installationPayload);
         }
       } catch (installError: unknown) {
-        // Ne pas bloquer la mise à jour principale si la copie échoue
+        // Ne pas bloquer la copie vers installation si elle échoue
         console.error(
           'Erreur lors de la copie vers installation:',
           installError
         );
+      }
+    }
+
+    if (existing.section === 'installation' && currentPvChantier === 'Reçu') {
+      try {
+        const consuelQuery: Record<string, unknown> = {
+          section: 'consuel-en-cours',
+        };
+        if (clientId) {
+          consuelQuery.clientId = clientId;
+        } else {
+          consuelQuery.client = (existing as ExistingDocument).client;
+        }
+
+        const existingInConsuel = await Model.findOne(consuelQuery).lean();
+        if (!existingInConsuel) {
+          const consuelPayload = {
+            ...updated.toObject(),
+            _id: undefined,
+            section: 'consuel-en-cours',
+            stages: {
+              ...updated.stages,
+              'consuel-en-cours': {
+                statut: updated.statut || 'En cours',
+                date: new Date().toISOString(),
+                updatedAt: new Date(),
+              },
+            },
+          };
+          await Model.create(consuelPayload);
+        }
+      } catch (copyError: unknown) {
+        console.error('Erreur lors de la copie vers Consuel En Cours:', copyError);
+      }
+    }
+
+    if (
+      newSection === 'consuel-en-cours' &&
+      newPvChantier === 'Reçu'
+    ) {
+      try {
+        const query: Record<string, unknown> = { section: 'daact' };
+        if (clientId) {
+          query.clientId = clientId;
+        } else {
+          query.client = (existing as ExistingDocument).client;
+        }
+
+        const existingInDaact = await Model.findOne(query).lean();
+        if (!existingInDaact) {
+          const daactPayload = {
+            ...updated.toObject(),
+            _id: undefined,
+            section: 'daact',
+            statut: 'DAACT à faire',
+            stages: {
+              ...updated.stages,
+              daact: {
+                statut: 'DAACT à faire',
+                date: new Date().toISOString(),
+                updatedAt: new Date(),
+              },
+            },
+          };
+          await Model.create(daactPayload);
+        }
+      } catch (copyError: unknown) {
+        console.error('Erreur lors de la copie vers DAACT:', copyError);
+      }
+    }
+
+    if (
+      updated.section === 'consuel-finalise' &&
+      (((data.statut as string)?.trim().toLowerCase() === 'consuel visé') ||
+        (updated.statut as string)?.trim().toLowerCase() === 'consuel visé')
+    ) {
+      try {
+        const query: Record<string, unknown> = {
+          section: 'raccordement',
+          $or: [],
+        };
+        if (clientId) {
+          query.$or = [
+            { clientId },
+            { client: (existing as ExistingDocument).client },
+          ];
+        } else {
+          query.$or = [{ client: (existing as ExistingDocument).client }];
+        }
+
+        const existingInRaccordement = await Model.findOne(query).lean();
+        if (!existingInRaccordement) {
+          const raccordementPayload = {
+            ...updated.toObject(),
+            _id: undefined,
+            section: 'raccordement',
+            statut: 'Raccordement à faire',
+            raccordement: 'Demande transmise',
+            stages: {
+              ...updated.stages,
+              raccordement: {
+                statut: 'Raccordement à faire',
+                date: new Date().toISOString(),
+                updatedAt: new Date(),
+              },
+            },
+          };
+          await Model.create(raccordementPayload);
+        }
+      } catch (copyError: unknown) {
+        console.error('Erreur lors de la copie vers raccordement:', copyError);
+      }
+    }
+
+    if (
+      updated.section === 'raccordement' &&
+      (data.raccordement === 'Mise en service' ||
+        updated.raccordement === 'Mise en service')
+    ) {
+      try {
+        const query: Record<string, unknown> = {
+          section: 'raccordement-mes',
+        };
+        if (clientId) {
+          query.clientId = clientId;
+        } else {
+          query.client = (existing as ExistingDocument).client;
+        }
+
+        const existingInMes = await Model.findOne(query).lean();
+        if (!existingInMes) {
+          const mesPayload = {
+            ...updated.toObject(),
+            _id: undefined,
+            section: 'raccordement-mes',
+            statut: updated.statut || updated.raccordement || 'Mise en service',
+            dateMiseEnService:
+              updated.dateMiseEnService || new Date().toISOString(),
+            stages: {
+              ...updated.stages,
+              'raccordement-mes': {
+                statut: updated.statut || updated.raccordement || 'Mise en service',
+                date:
+                  updated.dateMiseEnService || new Date().toISOString(),
+                updatedAt: new Date(),
+              },
+            },
+          };
+          await Model.create(mesPayload);
+        }
+      } catch (copyError: unknown) {
+        console.error('Erreur lors de la copie vers Raccordement MES:', copyError);
       }
     }
 
@@ -157,10 +371,62 @@ export async function PATCH(
       return NextResponse.json({ error: 'Client non trouvé' }, { status: 404 });
     }
 
-    const updatedStages = buildStageUpdate(data, existing as ExistingDocument);
+    const payload = { ...data };
+    const currentSection =
+      (data.section as string) || (existing as ExistingDocument).section;
+    const currentStatut =
+      (data.statut as string) || (existing as ExistingDocument).statut || '';
+    const currentPvChantier =
+      (data.pvChantier as string) ||
+      ((existing as any).pvChantier as string) ||
+      '';
+    const currentRaccordement =
+      (data.raccordement as string) ||
+      ((existing as any).raccordement as string) ||
+      '';
+
+    const normalizedStatut = currentStatut.trim();
+    const isDpAccordTransition =
+      (existing.section === 'dp-en-cours' || payload.section === 'dp-accordes') &&
+      (normalizedStatut === 'Accord favorable' ||
+        normalizedStatut === 'Accord tacite');
+    const isDpRefusTransition =
+      (existing.section === 'dp-en-cours' || payload.section === 'dp-refuses') &&
+      normalizedStatut === 'Refus';
+
+    // DP EN COURS transitions
+    if (isDpAccordTransition) {
+      payload.section = 'dp-accordes';
+    } else if (isDpRefusTransition) {
+      payload.section = 'dp-refuses';
+    }
+
+    // INSTALLATION transitions
+    if (currentSection === 'installation' && currentPvChantier === 'Reçu') {
+      payload.section = 'daact';
+      payload.statut = payload.statut || 'DAACT à faire';
+    }
+
+    // CONSUEL EN COURS transitions
+    if (
+      currentSection === 'consuel-en-cours' &&
+      currentStatut.trim().toLowerCase() === 'consuel visé'
+    ) {
+      payload.section = 'consuel-finalise';
+    }
+
+    // RACCORDEMENT transitions
+    if (
+      currentSection === 'raccordement' &&
+      currentRaccordement === 'Mise en service'
+    ) {
+      payload.section = 'raccordement-mes';
+    }
+
+    const updatedStages = buildStageUpdate(payload, existing as ExistingDocument);
     const updated = await Model.findByIdAndUpdate(
       id,
-      { ...data, stages: updatedStages },
+      { ...payload, stages: updatedStages },
       { new: true }
     );
 
@@ -170,18 +436,28 @@ export async function PATCH(
 
     // Si le client est dans dp-accordes avec statut Accord tacite ou Accord favorable,
     // créer une copie dans installation
-    const newSection = data.section || (existing as ExistingDocument).section;
-    const newStatut = data.statut || (existing as ExistingDocument).statut;
+    const newSection = payload.section || (existing as ExistingDocument).section;
+    const newStatut = payload.statut || (existing as ExistingDocument).statut;
+    const clientId =
+      data.clientId ||
+      (updated as any).clientId ||
+      (existing as any).clientId;
+
     if (
       newSection === 'dp-accordes' &&
       (newStatut === 'Accord tacite' || newStatut === 'Accord favorable')
     ) {
       try {
-        // Vérifier si une copie existe déjà dans installation
-        const existingInInstallation = await Model.findOne({
-          client: (existing as ExistingDocument).client,
+        const installationQuery: Record<string, unknown> = {
           section: 'installation',
-        }).lean();
+        };
+        if (clientId) {
+          installationQuery.clientId = clientId;
+        } else {
+          installationQuery.client = (existing as ExistingDocument).client;
+        }
+
+        const existingInInstallation = await Model.findOne(installationQuery).lean();
 
         if (!existingInInstallation) {
           const installationPayload = {
@@ -206,6 +482,126 @@ export async function PATCH(
           'Erreur lors de la copie vers installation:',
           installError
         );
+      }
+    }
+
+    if (
+      existing.section === 'installation' &&
+      currentPvChantier === 'Reçu'
+    ) {
+      try {
+        const consuelQuery: Record<string, unknown> = {
+          section: 'consuel-en-cours',
+        };
+        if (clientId) {
+          consuelQuery.clientId = clientId;
+        } else {
+          consuelQuery.client = (existing as ExistingDocument).client;
+        }
+
+        const existingInConsuel = await Model.findOne(consuelQuery).lean();
+        if (!existingInConsuel) {
+          const consuelPayload = {
+            ...updated.toObject(),
+            _id: undefined,
+            section: 'consuel-en-cours',
+            stages: {
+              ...updated.stages,
+              'consuel-en-cours': {
+                statut: updated.statut || 'En cours',
+                date: new Date().toISOString(),
+                updatedAt: new Date(),
+              },
+            },
+          };
+          await Model.create(consuelPayload);
+        }
+      } catch (copyError: unknown) {
+        console.error('Erreur lors de la copie vers Consuel En Cours:', copyError);
+      }
+    }
+
+    if (
+      updated.section === 'consuel-finalise' &&
+      (((data.statut as string)?.trim().toLowerCase() === 'consuel visé') ||
+        (updated.statut as string)?.trim().toLowerCase() === 'consuel visé')
+    ) {
+      try {
+        const query: Record<string, unknown> = {
+          section: 'raccordement',
+          $or: [],
+        };
+        if (clientId) {
+          query.$or = [
+            { clientId },
+            { client: (existing as ExistingDocument).client },
+          ];
+        } else {
+          query.$or = [{ client: (existing as ExistingDocument).client }];
+        }
+
+        const existingInRaccordement = await Model.findOne(query).lean();
+        if (!existingInRaccordement) {
+          const raccordementPayload = {
+            ...updated.toObject(),
+            _id: undefined,
+            section: 'raccordement',
+            statut: 'Raccordement à faire',
+            raccordement: 'Demande transmise',
+            stages: {
+              ...updated.stages,
+              raccordement: {
+                statut: 'Raccordement à faire',
+                date: new Date().toISOString(),
+                updatedAt: new Date(),
+              },
+            },
+          };
+          await Model.create(raccordementPayload);
+        }
+      } catch (copyError: unknown) {
+        console.error('Erreur lors de la copie vers raccordement:', copyError);
+      }
+    }
+
+    if (
+      updated.section === 'raccordement' &&
+      (data.raccordement === 'Mise en service' ||
+        updated.raccordement === 'Mise en service')
+    ) {
+      try {
+        const query: Record<string, unknown> = {
+          section: 'raccordement-mes',
+        };
+        if (clientId) {
+          query.clientId = clientId;
+        } else {
+          query.client = (existing as ExistingDocument).client;
+        }
+
+        const existingInMes = await Model.findOne(query).lean();
+        if (!existingInMes) {
+          const mesPayload = {
+            ...updated.toObject(),
+            _id: undefined,
+            section: 'raccordement-mes',
+            statut: updated.statut || updated.raccordement || 'Mise en service',
+            dateMiseEnService:
+              updated.dateMiseEnService || new Date().toISOString(),
+            stages: {
+              ...updated.stages,
+              'raccordement-mes': {
+                statut: updated.statut || updated.raccordement || 'Mise en service',
+                date:
+                  updated.dateMiseEnService || new Date().toISOString(),
+                updatedAt: new Date(),
+              },
+            },
+          };
+          await Model.create(mesPayload);
+        }
+      } catch (copyError: unknown) {
+        console.error('Erreur lors de la copie vers Raccordement MES:', copyError);
       }
     }
 

@@ -71,23 +71,6 @@ export function getRaccordementBadgeColor(raccordement?: string) {
   return 'bg-gradient-to-r from-gray-100 to-gray-200 text-gray-700 border-gray-300 dark:from-gray-800 dark:to-gray-700 dark:text-gray-300 dark:border-gray-600';
 }
 
-export function getEtatActuelBadgeColor(etatActuel?: string) {
-  if (!etatActuel)
-    return 'bg-gradient-to-r from-gray-100 to-gray-200 text-gray-700 border-gray-300 dark:from-gray-800 dark:to-gray-700 dark:text-gray-300 dark:border-gray-600';
-
-  if (etatActuel === "En attente d'instruction") {
-    return 'bg-gradient-to-r from-yellow-100 to-amber-100 text-yellow-700 border-yellow-300 dark:from-yellow-900/40 dark:to-amber-900/40 dark:text-yellow-400 dark:border-yellow-700';
-  }
-  if (etatActuel === 'Avis de visite') {
-    return 'bg-gradient-to-r from-blue-100 to-indigo-100 text-blue-700 border-blue-300 dark:from-blue-900/40 dark:to-indigo-900/40 dark:text-blue-400 dark:border-blue-700';
-  }
-  if (etatActuel === 'Consuel visé') {
-    return 'bg-gradient-to-r from-emerald-100 to-green-100 text-emerald-700 border-emerald-300 dark:from-emerald-900/40 dark:to-green-900/40 dark:text-emerald-400 dark:border-emerald-700';
-  }
-
-  return 'bg-gradient-to-r from-gray-100 to-gray-200 text-gray-700 border-gray-300 dark:from-gray-800 dark:to-gray-700 dark:text-gray-300 dark:border-gray-600';
-}
-
 export function getTypeConsuelBadgeColor(typeConsuel?: string) {
   if (!typeConsuel)
     return 'bg-gradient-to-r from-gray-100 to-gray-200 text-gray-700 border-gray-300 dark:from-gray-800 dark:to-gray-700 dark:text-gray-300 dark:border-gray-600';
@@ -102,19 +85,6 @@ export function getTypeConsuelBadgeColor(typeConsuel?: string) {
   return 'bg-gradient-to-r from-gray-100 to-gray-200 text-gray-700 border-gray-300 dark:from-gray-800 dark:to-gray-700 dark:text-gray-300 dark:border-gray-600';
 }
 
-export function getPrestataireBadgeColor(prestataire?: string) {
-  if (!prestataire)
-    return 'bg-gradient-to-r from-gray-100 to-gray-200 text-gray-700 border-gray-300 dark:from-gray-800 dark:to-gray-700 dark:text-gray-300 dark:border-gray-600';
-
-  if (prestataire === 'Eversun') {
-    return 'bg-gradient-to-r from-emerald-100 to-green-100 text-emerald-700 border-emerald-300 dark:from-emerald-900/40 dark:to-green-900/40 dark:text-emerald-400 dark:border-emerald-700';
-  }
-  if (prestataire === 'Projet Solaire') {
-    return 'bg-gradient-to-r from-orange-100 to-amber-100 text-orange-700 border-orange-300 dark:from-orange-900/40 dark:to-amber-900/40 dark:text-orange-400 dark:border-orange-700';
-  }
-
-  return 'bg-gradient-to-r from-gray-100 to-gray-200 text-gray-700 border-gray-300 dark:from-gray-800 dark:to-gray-700 dark:text-gray-300 dark:border-gray-600';
-}
 
 export function getCauseNonPresenceBadgeColor(causeNonPresence?: string) {
   if (!causeNonPresence)
